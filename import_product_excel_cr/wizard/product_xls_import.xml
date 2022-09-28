@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="product_import_report_view" model="ir.ui.view">
+        <field name="name">product.barcode.import.report</field>
+        <field name="model">product.barcode.import.report</field>
+        <field name="arch" type="xml">
+            <form string="Product Excel Report">
+                <group>
+                    <group>
+                        <field name="xls_file"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="import_product_entry" string="Import" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_product_excel_report_import" model="ir.actions.act_window">
+        <field name="name">Import Product</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.barcode.import.report</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="product_import_report_view"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_product_excel_report"
+              name="Import Product"
+              action="action_product_excel_report_import"
+              parent="sale.product_menu_catalog"
+              sequence="1000"
+    />
+
+</odoo>
