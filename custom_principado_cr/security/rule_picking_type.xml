@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--Rules for Stock Picking Type-->
+        <record id="warehouse_rule_stock_picking_type" model="ir.rule">
+            <field name="name">Operation Type For Warehouse Users</field>
+            <field name="model_id" ref="stock.model_stock_picking_type"/>
+            <field name="groups" eval="[(4,ref('stock.group_stock_manager')),(4,ref('stock.group_stock_user'))]" />
+            <field name="domain_force">[('warehouse_id','in',user.warehouse_ids.ids)]</field>
+        </record>
+
+        <record id="warehouse_rule_stock_picking_type_admin" model="ir.rule">
+            <field name="name">Operation Type For Admin User</field>
+            <field name="model_id" ref="stock.model_stock_picking_type"/>
+            <field name="groups" eval="[(4,ref('base.group_system'))]" />
+            <field name="domain_force">[(1,'=',1)]</field>
+        </record>
+
+
+
+        <!--Rules for Stock Picking-->
+        <record id="warehouse_rule_stock_picking" model="ir.rule">
+            <field name="name">Transfers Warehouse Users</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="groups" eval="[(4,ref('stock.group_stock_manager')),(4,ref('stock.group_stock_user'))]" />
+            <field name="domain_force">[('picking_type_id.warehouse_id','in',user.warehouse_ids.ids)]</field>
+        </record>
+
+        <record id="warehouse_rule_stock_picking_admin" model="ir.rule">
+            <field name="name">Transfers For Admin User</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="groups" eval="[(4,ref('base.group_system'))]" />
+            <field name="domain_force">[(1,'=',1)]</field>
+        </record>
+
+    </data>
+</odoo>
