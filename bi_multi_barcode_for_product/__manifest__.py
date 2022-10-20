@@ -7,7 +7,6 @@
     "category" : "Warehouse",
     'summary': 'Product Multi Barcode for Product multiple barcode for product barcode search product based on barcode product barcode generator product different barcode product many barcode product multi barcode for sale multi barcode create multiple barcode for product',
     "description": """
-    
         Multi barcode for product in odoo,
         Assigned multiple barcode to single product in odoo,
         Search product based on multiple barcode in odoo,
@@ -26,6 +25,11 @@
         'security/ir.model.access.csv',
         'views/product.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'bi_multi_barcode_for_product/static/src/**/*.js',
+        ],
+    },
     "auto_install": False,
     "installable": True,
     "live_test_url":'https://youtu.be/6pCMrTdyp_Q',
