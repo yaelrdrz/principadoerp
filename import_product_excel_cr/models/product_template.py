@@ -6,6 +6,17 @@ from odoo.exceptions import ValidationError, RedirectWarning, UserError
 
 _logger = logging.getLogger(__name__)
 
+class ProductUnspscCode(models.Model):
+    _inherit = "product.unspsc.code"
+
+    comp_name = fields.Char("Import Name", compute="_set_comp_name", store=True)
+
+    @api.depends("name","code")
+    def _set_comp_name(self):
+        for rec in self:
+            if rec.name and rec.code:
+                rec.comp_name = rec.code+"-"+rec.name
+
 
 class ProductTemplate(models.Model):
     _inherit = "product.template"

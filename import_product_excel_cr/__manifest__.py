@@ -14,7 +14,7 @@ Description
     'author': "Candidroot Solutions Pvt. Ltd.",
     'website': "https://candidroot.com/",
     'category': 'Tools',
-    'depends': ['product'],
+    'depends': ['product','product_unspsc'],
     "data": [
         'security/ir.model.access.csv',
         'wizard/product_xls_import.xml',
