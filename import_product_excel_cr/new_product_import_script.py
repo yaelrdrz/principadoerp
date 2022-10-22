@@ -2,15 +2,13 @@ import xmlrpc.client as xmlrpclib
 import csv
 import logging
 _logger = logging.getLogger(__name__)
-#Live
-# filepath = "/home/hardik/Downloads/principado_product/1.csv"
-filelist = [
-    "/home/odoo/src/user/import_product_excel_cr/principado_product/1.csv",
-    "/home/odoo/src/user/import_product_excel_cr/principado_product/2.csv",
-    "/home/odoo/src/user/import_product_excel_cr/principado_product/3.csv",
-    "/home/odoo/src/user/import_product_excel_cr/principado_product/4.csv",
-            ]
-# filepath = "/home/hardik/Downloads/test_principado.csv"
+# filelist = [
+#     "/home/odoo/src/user/import_product_excel_cr/principado_product/1.csv",
+#     "/home/odoo/src/user/import_product_excel_cr/principado_product/2.csv",
+#     "/home/odoo/src/user/import_product_excel_cr/principado_product/3.csv",
+#     "/home/odoo/src/user/import_product_excel_cr/principado_product/4.csv",
+#             ]
+filelist = ['/home/odoo/src/user/import_product_excel_cr/principado_product/test_principado.csv']
 not_found = []
 for filepath in filelist:
     file_size = open(filepath)
@@ -29,8 +27,10 @@ for filepath in filelist:
     reader_uom = csv.DictReader(file_uom,delimiter=",")
     reader = csv.DictReader(file,delimiter=",")
     db_name = "yaelrdrz-principadoerp-main-5969988"
+    # db_name = "db_principado15"
     db_password = "admin"
     server = xmlrpclib.ServerProxy('https://principado.odoo.com/xmlrpc/object',allow_none=True)
+    # server = xmlrpclib.ServerProxy('http://localhost:8069/xmlrpc/object',allow_none=True)
     product_template_list = []
     size_list = [x['Attribute_1_size'] for x in reader_size]
     color_list = [x['Attribute_2_color'] for x in reader_color]
@@ -130,27 +130,32 @@ for filepath in filelist:
                 product_tmpl_id = [server.execute(db_name, 2, db_password, 'product.template', "create", product_tmpl_vals)]
             if product_tmpl_id:
                 for line_2 in v:
+                    # print("-------product_id-------------", line_2)
                     product_template_size_attribute_value_id = server.execute(db_name, 2, db_password,
                                                                               'product.template.attribute.value',
-                                                                              "search", [('product_tmpl_id', '=',
+                                                                              "search", [('attribute_id','=',size_attribute_id[0]),('product_tmpl_id', '=',
                                                                                           product_tmpl_id[0]), (
                                                                                          'name', '=',
                                                                                          line_2['Attribute_1_size'])])
                     product_template_color_attribute_value_id = server.execute(db_name, 2, db_password,
                                                                                'product.template.attribute.value',
-                                                                               "search", [('product_tmpl_id', '=',
+                                                                               "search", [('attribute_id','=',color_attribute_id[0]),('product_tmpl_id', '=',
                                                                                            product_tmpl_id[0]), (
                                                                                           'name', '=',
                                                                                           line_2['Attribute_2_color'])])
+                    # print("----------product_template_size_attribute_value_id-------",product_template_size_attribute_value_id)
+                    # print("----------product_template_color_attribute_value_id-------",product_template_color_attribute_value_id)
                     if product_template_size_attribute_value_id and product_template_color_attribute_value_id:
                         prod_variant_domain = [('product_tmpl_id', '=', product_tmpl_id[0]),
                                                ('name', '=', k),
                                                ('product_template_attribute_value_ids', 'in',
-                                                [product_template_size_attribute_value_id[0]]),
+                                                [product_template_size_attribute_value_id[-1]]),
                                                ('product_template_attribute_value_ids', 'in',
-                                                [product_template_color_attribute_value_id[0]])]
+                                                [product_template_color_attribute_value_id[-1]])]
+                        # print("--------prod_variant_domain----------",prod_variant_domain)
                         product_id = server.execute(db_name, 2, db_password, 'product.product', "search",
                                                     prod_variant_domain)
+                        # print("-------product_id-------------",product_id)
                         if product_id:
                             barcode_update = server.execute(db_name, 2, db_password, 'product.barcode', "write",
                                                             [barcode_value_dict.get(x) for x in line_2['Barcodes']],
