@@ -494,12 +494,14 @@ class PosSession(models.Model):
                 ('move_id', 'in', (global_invoice.id, account_move.id)),
                 ('account_id', '=', pos_session.config_id.global_customer_id.property_account_receivable_id.id),
                 ('name', '!=', 'From invoiced orders')
-                ]).reconcile()
+                ])
+                print("---------move_lines----------",move_lines)
                 # print("move_lines",move_lines)
-                # for line in move_lines:
-                #     print("line",line)
+                for line in move_lines:
+                    print("line",line.move_id)
                 #     line.reconcile()
 
+        stop
         records.write({'has_global_invoice': True})
 
 
