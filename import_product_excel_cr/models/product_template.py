@@ -21,6 +21,11 @@ class ProductUnspscCode(models.Model):
 class ProductTemplate(models.Model):
     _inherit = "product.template"
 
+    size_attribute_value_id = fields.Many2one("product.attribute.value", string="Size Value")
+    color_attribute_value_id = fields.Many2one("product.attribute.value", string="Color Value")
+
+
+
     def _create_variant_ids(self):
         self.flush()
         Product = self.env["product.product"]

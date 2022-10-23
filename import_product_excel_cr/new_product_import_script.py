@@ -2,8 +2,8 @@ import xmlrpc.client as xmlrpclib
 import csv
 import logging
 _logger = logging.getLogger(__name__)
-filelist = ['/home/odoo/src/user/import_product_excel_cr/principado_product/final_catalogue_141022_latest.csv']
-# filelist = ['/home/hardik/workspace/cr/principadoerp/import_product_excel_cr/principado_product/test.csv']
+# filelist = ['/home/odoo/src/user/import_product_excel_cr/principado_product/final_catalogue_141022_latest.csv']
+filelist = ['/home/hardik/workspace/cr/principadoerp/import_product_excel_cr/principado_product/test.csv']
 not_found = []
 missing_unspsc_categ = []
 for filepath in filelist:
@@ -118,7 +118,7 @@ for filepath in filelist:
         prod_tmpl_dict = {}
         print("----------k----------------",k)
         # print("----------v----------------",v)
-        already_created = True
+        # already_created = True
         try:
             product_tmpl_id = server.execute(db_name, 2, db_password, 'product.template', "search",[('name', '=', k)])
             if not product_tmpl_id:
@@ -143,7 +143,7 @@ for filepath in filelist:
                 }
                 product_tmpl_id = [server.execute(db_name, 2, db_password, 'product.template', "create", product_tmpl_vals)]
                 already_created = False
-            if product_tmpl_id and not already_created:
+            if product_tmpl_id:
                 for line_2 in v:
                     # print("-------product_id-------------", line_2)
                     product_template_size_attribute_value_id = server.execute(db_name, 2, db_password,
