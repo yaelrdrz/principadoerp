@@ -2,14 +2,10 @@ import xmlrpc.client as xmlrpclib
 import csv
 import logging
 _logger = logging.getLogger(__name__)
-# filelist = [
-#     "/home/odoo/src/user/import_product_excel_cr/principado_product/1.csv",
-#     "/home/odoo/src/user/import_product_excel_cr/principado_product/2.csv",
-#     "/home/odoo/src/user/import_product_excel_cr/principado_product/3.csv",
-#     "/home/odoo/src/user/import_product_excel_cr/principado_product/4.csv",
-#             ]
-filelist = ['/home/odoo/src/user/import_product_excel_cr/principado_product/test_principado.csv']
+filelist = ['/home/odoo/src/user/import_product_excel_cr/principado_product/final_catalogue_141022_latest.csv']
+# filelist = ['/home/hardik/workspace/cr/principadoerp/import_product_excel_cr/principado_product/test.csv']
 not_found = []
+missing_unspsc_categ = []
 for filepath in filelist:
     file_size = open(filepath)
     file_color = open(filepath)
@@ -65,8 +61,17 @@ for filepath in filelist:
             color_value_id = [server.execute(db_name, 2, db_password, 'product.attribute.value', "create",{'name': color, 'attribute_id': color_attribute_id[0]})]
         color_value_dict.update({color: color_value_id[0]})
     for unspsc in list(set(unspsc_list)):
-        unspsc_id = server.execute(db_name, 2, db_password, 'product.unspsc.code', "search", [('code','ilike',unspsc)])
-        unspsc_value_dict.update({unspsc: unspsc_id and unspsc_id[0] or False})
+        unspsc_id = server.execute(db_name, 2, db_password, 'product.unspsc.code', "search",
+                                   [('comp_name', '=like', unspsc)])
+        if not unspsc_id:
+            unspsc_split = unspsc.split("-")
+            if len(unspsc_split) > 1:
+                unspsc_id = server.execute(db_name, 2, db_password, 'product.unspsc.code', "search",
+                                           [('code', '=like', unspsc_split[0])])
+        if unspsc_id:
+            unspsc_value_dict.update({unspsc: unspsc_id and unspsc_id[0] or False})
+        else:
+            missing_unspsc_categ.append(unspsc)
     for vendor in list(set(vendor_list)):
         vendor_id = server.execute(db_name, 2, db_password, 'res.partner', "search", [('name','=',vendor)])
         if not vendor_id:
@@ -80,6 +85,9 @@ for filepath in filelist:
             barcode_id = [server.execute(db_name, 2, db_password, 'product.barcode', "create",{'barcode': barcode})]
         barcode_value_dict.update({barcode: barcode_id[0]})
     final_dict = {}
+    tmpl_price = {}
+    tmpl_unspsc_dict = {}
+    tmpl_vendor_dict = {}
     for line in reader:
         if final_dict and line['Product_template_name'] in final_dict.keys():
             for k_dict, v_dict in final_dict.items():
@@ -103,6 +111,9 @@ for filepath in filelist:
             final_dict.update({line['Product_template_name']: [{'Attribute_1_size': line['Attribute_1_size'],'Attribute_2_color': line['Attribute_2_color'],
                                                                 'Variant_internal_reference': line['Variant_internal_reference'],
                                                                 'Barcodes': [line['Barcode']]}]})
+            tmpl_price.update({line['Product_template_name']: line['Unit price']})
+            tmpl_unspsc_dict.update({line['Product_template_name']: unspsc_value_dict.get(line['UNSPSC_Category'])})
+            tmpl_vendor_dict.update({line['Product_template_name']: vendor_value_dict.get(line['Provider'])})
     for k,v in final_dict.items():
         prod_tmpl_dict = {}
         print("----------k----------------",k)
@@ -118,14 +129,16 @@ for filepath in filelist:
                     'type': 'product',
                     'website_published': True,
                     'tracking': 'lot',
+                    "list_price": tmpl_price.get(k),
                     'sale_ok': True,
                     'purchase_ok': True,
                     'invoice_policy': 'order',
                     'purchase_method': 'purchase',
-                    'unspsc_code_id': unspsc_value_dict.get(line['UNSPSC_Category']),
+                    # 'unspsc_code_id': unspsc_value_dict.get(line['UNSPSC_Category']),
+                    'unspsc_code_id': tmpl_unspsc_dict.get(k),
                     'attribute_line_ids': variant_vals,
                     'seller_ids': vendor_value_dict and [
-                        (0, 0, {'name': vendor_value_dict.get(line['Provider']), 'min_qty': 1.0})],
+                        (0, 0, {'name': tmpl_vendor_dict.get(k), 'min_qty': 1.0})],
                 }
                 product_tmpl_id = [server.execute(db_name, 2, db_password, 'product.template', "create", product_tmpl_vals)]
             if product_tmpl_id:
@@ -175,3 +188,4 @@ for filepath in filelist:
         except:
             not_found.append(k)
 print("-----------not_found-----------",not_found)
+print("-----------missing_unspsc_categ-----------",missing_unspsc_categ)
