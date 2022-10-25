@@ -68,13 +68,22 @@ for filepath in filelist:
         if not vendor_id:
             vendor_id = [server.execute(db_name, 2, db_password, 'res.partner', "create", {'name' : vendor})]
         vendor_value_dict.update({vendor: vendor_id[0]})
+    line_count = 0
     for line in reader:
+        already_created = False
+        line_count += 1
+        print("line_count------------",line_count)
         try:
-            product_tmpl_id = server.execute(db_name, 2, db_password, 'product.template', "search_read",[('name', '=', line['Product_template_name']),
+            # product_tmpl_id = server.execute(db_name, 2, db_password, 'product.template', "search_read",[('name', '=', line['Product_template_name']),
+            #                                                                                         ('default_code', '=', line['Variant_internal_reference']),
+            #                                                                                         ('size_attribute_value_id', '=', size_value_dict.get(line['Attribute_1_size'])),
+            #                                                                                         ('color_attribute_value_id', '=', color_value_dict.get(line['Attribute_2_color'])),
+            #                                                                                         ],['product_variant_id'])
+            product_tmpl_id = server.execute(db_name, 2, db_password, 'product.template', "search",[('name', '=', line['Product_template_name']),
                                                                                                     ('default_code', '=', line['Variant_internal_reference']),
                                                                                                     ('size_attribute_value_id', '=', size_value_dict.get(line['Attribute_1_size'])),
                                                                                                     ('color_attribute_value_id', '=', color_value_dict.get(line['Attribute_2_color'])),
-                                                                                                    ],['product_variant_id'])
+                                                                                                    ])
             if not product_tmpl_id:
                 variant_vals = [(0,0,{'attribute_id':size_attribute_id[0],'value_ids': [size_value_dict.get(line['Attribute_1_size'])]}),
                                 (0,0,{'attribute_id':color_attribute_id[0],'value_ids': [color_value_dict.get(line['Attribute_2_color'])]})]
@@ -97,13 +106,15 @@ for filepath in filelist:
                     'size_attribute_value_id': size_value_dict.get(line['Attribute_1_size']),
                     'color_attribute_value_id': color_value_dict.get(line['Attribute_2_color'])
                 }
-                tmpl_id = server.execute(db_name, 2, db_password, 'product.template', "create", product_tmpl_vals)
-                product_tmpl_id = server.execute(db_name, 2, db_password, 'product.template', "search_read",
-                                                 [('id', '=', tmpl_id)], ['product_variant_id'])
+                product_tmpl_id = [server.execute(db_name, 2, db_password, 'product.template', "create", product_tmpl_vals)]
+                # product_tmpl_id = server.execute(db_name, 2, db_password, 'product.template', "search",
+                #                                  [('id', '=', tmpl_id)], ['product_variant_id'])
+                already_created = True
             # print("----------product_tmpl_id-----------",product_tmpl_id)
-            if product_tmpl_id:
-                barcode_update = server.execute(db_name, 2, db_password, 'product.barcode', "create",{"barcode": line['Barcode'],"product_id": product_tmpl_id[0].get("product_variant_id")[0],
-                                                                                                      "product_tmpl_id":product_tmpl_id[0].get("id")})
+            if product_tmpl_id and already_created:
+                barcode_update = server.execute(db_name, 2, db_password, 'product.barcode', "create",{"barcode": line['Barcode'],
+                                                                                                      # "product_id": product_tmpl_id[0].get("product_variant_id")[0],
+                                                                                                      "product_tmpl_id":product_tmpl_id[0]})
         except:
             not_found.append({"tmpl_name": line['Product_template_name'],"size": line['Attribute_1_size'],"color": line['Attribute_2_color'],"price": line['Unit price']})
 print("-----------not_found-----------",not_found)
