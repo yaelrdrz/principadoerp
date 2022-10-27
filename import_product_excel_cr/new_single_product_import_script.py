@@ -72,17 +72,17 @@ for filepath in filelist:
         if not vendor_id:
             vendor_id = [server.execute(db_name, 2, db_password, 'res.partner', "create", {'name' : vendor})]
         vendor_value_dict.update({vendor: vendor_id[0]})
-    for barcode in list(set(barcode_list)):
-        barcode_id = server.execute(db_name, 2, db_password, 'product.barcode', "search", [('barcode','=',barcode)])
-        if not barcode_id:
-            barcode_id = [server.execute(db_name, 2, db_password, 'product.barcode', "create",{'barcode': barcode})]
-        barcode_value_dict.update({barcode: barcode_id[0]})
+    # for barcode in list(set(barcode_list)):
+    #     barcode_id = server.execute(db_name, 2, db_password, 'product.barcode', "search", [('barcode','=',barcode)])
+    #     if not barcode_id:
+    #         barcode_id = [server.execute(db_name, 2, db_password, 'product.barcode', "create",{'barcode': barcode})]
+    #     barcode_value_dict.update({barcode: barcode_id[0]})
     all_lines = []
     for line_read in reader:
         all_lines.append(line_read)
     # line_count = 0
     for line in all_lines:
-        already_created = False
+        # already_created = False
         # line_count += 1
         # print("line_count------------",line_count)
         try:
@@ -91,11 +91,14 @@ for filepath in filelist:
             #                                                                                         ('size_attribute_value_id', '=', size_value_dict.get(line['Attribute_1_size'])),
             #                                                                                         ('color_attribute_value_id', '=', color_value_dict.get(line['Attribute_2_color'])),
             #                                                                                         ],['product_variant_id'])
-            product_tmpl_id = server.execute(db_name, 2, db_password, 'product.template', "search",[('name', '=', line['Product_template_name']),
-                                                                                                    ('default_code', '=', line['Variant_internal_reference']),
-                                                                                                    ('size_attribute_value_id', '=', size_value_dict.get(line['Attribute_1_size'])),
-                                                                                                    ('color_attribute_value_id', '=', color_value_dict.get(line['Attribute_2_color'])),
-                                                                                                    ])
+            # product_tmpl_id = server.execute(db_name, 2, db_password, 'product.template', "search",[('name', '=', line['Product_template_name']),
+            #                                                                                         ('default_code', '=', line['Variant_internal_reference']),
+            #                                                                                         ('size_attribute_value_id', '=', size_value_dict.get(line['Attribute_1_size'])),
+            #                                                                                         ('color_attribute_value_id', '=', color_value_dict.get(line['Attribute_2_color'])),
+            #                                                                                         ])
+            product_tmpl_id = server.execute(db_name, 2, db_password, 'product.template', "product_search_sql_xmlrpc",
+                                             [], line['Product_template_name'], line['Variant_internal_reference'], size_value_dict.get(line['Attribute_1_size']), color_value_dict.get(line['Attribute_2_color']))
+            print("-----product_tmpl_id-------", product_tmpl_id)
             if not product_tmpl_id:
                 variant_vals = [(0,0,{'attribute_id':size_attribute_id[0],'value_ids': [size_value_dict.get(line['Attribute_1_size'])]}),
                                 (0,0,{'attribute_id':color_attribute_id[0],'value_ids': [color_value_dict.get(line['Attribute_2_color'])]})]
@@ -121,12 +124,14 @@ for filepath in filelist:
                 product_tmpl_id = [server.execute(db_name, 2, db_password, 'product.template', "create", product_tmpl_vals)]
                 # product_tmpl_id = server.execute(db_name, 2, db_password, 'product.template', "search",
                 #                                  [('id', '=', tmpl_id)], ['product_variant_id'])
-                already_created = True
+                # already_created = True
             # print("----------product_tmpl_id-----------",product_tmpl_id)
-            if product_tmpl_id and already_created:
-                barcode_update = server.execute(db_name, 2, db_password, 'product.barcode', "write",
-                                                [barcode_value_dict.get(x) for x in line['Barcodes']],
-                                                {"product_tmpl_id": product_tmpl_id[0]})
+            # if product_tmpl_id and already_created:
+            #     barcode_update = server.execute(db_name, 2, db_password, 'product.template',"product_search_sql_xmlrpc",
+            #                                      [], line['Product_template_name']
+            #     barcode_update = server.execute(db_name, 2, db_password, 'product.barcode', "write",
+            #                                     [barcode_value_dict.get(x) for x in ],
+            #                                     {"product_tmpl_id": product_tmpl_id[0]})
                 # barcode_update = server.execute(db_name, 2, db_password, 'product.barcode', "create",{"barcode": line['Barcode'],
                 #                                                                                       # "product_id": product_tmpl_id[0].get("product_variant_id")[0],
                 #                                                                                       "product_tmpl_id":product_tmpl_id[0]})

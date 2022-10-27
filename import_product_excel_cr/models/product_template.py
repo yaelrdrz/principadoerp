@@ -25,6 +25,26 @@ class ProductTemplate(models.Model):
     color_attribute_value_id = fields.Many2one("product.attribute.value", string="Color Value")
 
 
+    def product_search_sql_xmlrpc(self,name=False,code=False,size_value_id=False,color_value_id=False):
+        if name and code and size_value_id and color_value_id:
+            self.env.cr.execute("""
+                SELECT
+                    tmpl.id
+                FROM
+                    product_template as tmpl
+                WHERE
+                    tmpl.name = %s AND
+                    tmpl.default_code = %s AND
+                    tmpl.size_attribute_value_id = %s AND
+                    tmpl.color_attribute_value_id = %s
+                GROUP BY
+                    tmpl.id
+            """, (name,code,size_value_id,color_value_id))
+            resp = self.env.cr.dictfetchall()
+            if resp:
+                return [resp[0].get("id")]
+        return False
+
 
     def _create_variant_ids(self):
         self.flush()
