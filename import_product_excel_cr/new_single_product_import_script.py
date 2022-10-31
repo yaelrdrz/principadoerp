@@ -2,8 +2,9 @@ import xmlrpc.client as xmlrpclib
 import csv
 import logging
 _logger = logging.getLogger(__name__)
-filelist = ['/home/odoo/src/user/import_product_excel_cr/principado_product/final_catalogue_141022_latest.csv']
+filelist = ['/home/odoo/src/user/import_product_excel_cr/principado_product/import_product_1.csv']
 # filelist = ['/home/hardik/workspace/cr/principadoerp/import_product_excel_cr/principado_product/final_catalogue_141022_latest.csv']
+# filelist = ['/home/hardik/workspace/cr/principadoerp/import_product_excel_cr/principado_product/test.csv']
 not_found = []
 missing_unspsc_categ = []
 for filepath in filelist:
@@ -98,7 +99,7 @@ for filepath in filelist:
             #                                                                                         ])
             product_tmpl_id = server.execute(db_name, 2, db_password, 'product.template', "product_search_sql_xmlrpc",
                                              [], line['Product_template_name'], line['Variant_internal_reference'], size_value_dict.get(line['Attribute_1_size']), color_value_dict.get(line['Attribute_2_color']))
-            print("-----product_tmpl_id-------", product_tmpl_id)
+            # print("-----product_tmpl_id-------", product_tmpl_id)
             if not product_tmpl_id:
                 variant_vals = [(0,0,{'attribute_id':size_attribute_id[0],'value_ids': [size_value_dict.get(line['Attribute_1_size'])]}),
                                 (0,0,{'attribute_id':color_attribute_id[0],'value_ids': [color_value_dict.get(line['Attribute_2_color'])]})]
