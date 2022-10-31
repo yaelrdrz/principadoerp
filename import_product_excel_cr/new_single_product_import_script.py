@@ -3,9 +3,9 @@ import csv
 import logging
 _logger = logging.getLogger(__name__)
 filelist = ['/home/odoo/src/user/import_product_excel_cr/principado_product/import_product_1.csv']
-# filelist = ['/home/hardik/workspace/cr/principadoerp/import_product_excel_cr/principado_product/final_catalogue_141022_latest.csv']
-# filelist = ['/home/hardik/workspace/cr/principadoerp/import_product_excel_cr/principado_product/test.csv']
+# filelist = ['/home/hardik/workspace/cr/principadoerp/import_product_excel_cr/principado_product/import_product_1.csv']
 not_found = []
+
 missing_unspsc_categ = []
 for filepath in filelist:
     file_size = open(filepath)
@@ -99,7 +99,7 @@ for filepath in filelist:
             #                                                                                         ])
             product_tmpl_id = server.execute(db_name, 2, db_password, 'product.template', "product_search_sql_xmlrpc",
                                              [], line['Product_template_name'], line['Variant_internal_reference'], size_value_dict.get(line['Attribute_1_size']), color_value_dict.get(line['Attribute_2_color']))
-            # print("-----product_tmpl_id-------", product_tmpl_id)
+            print("-----product_tmpl_id---search----", product_tmpl_id)
             if not product_tmpl_id:
                 variant_vals = [(0,0,{'attribute_id':size_attribute_id[0],'value_ids': [size_value_dict.get(line['Attribute_1_size'])]}),
                                 (0,0,{'attribute_id':color_attribute_id[0],'value_ids': [color_value_dict.get(line['Attribute_2_color'])]})]
@@ -119,14 +119,19 @@ for filepath in filelist:
                     'unspsc_code_id': unspsc_value_dict.get(line['UNSPSC_Category']),
                     'attribute_line_ids': variant_vals,
                     'seller_ids': vendor_value_dict and [(0, 0, {'name': vendor_value_dict.get(line['Provider']), 'min_qty': 1.0})],
+                    'vendor_partner_id': vendor_value_dict and vendor_value_dict.get(line['Provider']) or False,
                     'size_attribute_value_id': size_value_dict.get(line['Attribute_1_size']),
-                    'color_attribute_value_id': color_value_dict.get(line['Attribute_2_color'])
+                    'color_attribute_value_id': color_value_dict.get(line['Attribute_2_color']),
+                    'size_id': size_attribute_id[0],
+                    'size_value_id': size_value_dict.get(line['Attribute_1_size']),
+                    'color_id': color_attribute_id[0],
+                    'color_value_id': color_value_dict.get(line['Attribute_2_color']),
                 }
-                product_tmpl_id = [server.execute(db_name, 2, db_password, 'product.template', "create", product_tmpl_vals)]
+                product_tmpl_id = [server.execute(db_name, 2, db_password, 'product.template', "product_create_sql_xmlrpc", [],product_tmpl_vals)]
                 # product_tmpl_id = server.execute(db_name, 2, db_password, 'product.template', "search",
                 #                                  [('id', '=', tmpl_id)], ['product_variant_id'])
                 # already_created = True
-            # print("----------product_tmpl_id-----------",product_tmpl_id)
+                # print("----------product_tmpl_id----crea-------",product_tmpl_id)
             # if product_tmpl_id and already_created:
             #     barcode_update = server.execute(db_name, 2, db_password, 'product.template',"product_search_sql_xmlrpc",
             #                                      [], line['Product_template_name']
