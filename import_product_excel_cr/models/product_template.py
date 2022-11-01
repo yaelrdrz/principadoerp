@@ -39,6 +39,20 @@ class ProductTemplate(models.Model):
     size_attribute_value_id = fields.Many2one("product.attribute.value", string="Size Value")
     color_attribute_value_id = fields.Many2one("product.attribute.value", string="Color Value")
 
+
+    def update_attribute_values(self):
+        for rec in self:
+            if rec.size_attribute_value_id and rec.color_attribute_value_id and rec.attribute_line_ids:
+                for line in rec.attribute_line_ids:
+                    if not line.value_ids:
+                        if line.attribute_id.name == 'Size':
+                            line.value_ids = rec.size_attribute_value_id.ids
+                        elif line.attribute_id.name == 'Color':
+                            line.value_ids = rec.color_attribute_value_id.ids
+        return True
+
+
+
     def product_create_sql_xmlrpc(self, vals={}):
         if vals:
             tmpl_query = """

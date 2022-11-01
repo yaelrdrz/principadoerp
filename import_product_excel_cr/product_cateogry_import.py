@@ -6,11 +6,8 @@ _logger = logging.getLogger(__name__)
 # filelist = ['/home/hardik/workspace/cr/principadoerp/import_product_excel_cr/principado_product/test.csv']
 filelist = ['/home/odoo/src/user/import_product_excel_cr/principado_product/final_catalogue_141022_latest.csv']
 not_found = []
-missing_unspsc_categ = []
 missing_product_categ = []
 for filepath in filelist:
-    print("-------------filepath-------",filepath)
-    file_unspsc = open(filepath)
     file = open(filepath)
     reader = csv.DictReader(file,delimiter=",")
     db_name = "yaelrdrz-principadoerp-main-5969988"
@@ -18,8 +15,6 @@ for filepath in filelist:
     db_password = "admin"
     server = xmlrpclib.ServerProxy('https://principado.odoo.com/xmlrpc/object',allow_none=True)
     # server = xmlrpclib.ServerProxy('http://localhost:8069/xmlrpc/object',allow_none=True)
-    file_unspsc = open(filepath)
-    reader_unspsc = csv.DictReader(file_unspsc, delimiter=",")
     final_dict = []
     product_categ_1 = []
     product_categ_2 = []
@@ -160,20 +155,8 @@ for filepath in filelist:
                                          {'name': categ_10, 'property_cost_method': 'average',
                                           'property_valuation': 'real_time'})]
         product_categ_10_dict.update({categ_10: categ_id_10[0]})
-
-    # print("-------product_categ_1_dict--------",product_categ_1_dict)
-    # print("-------product_categ_2_dict--------",product_categ_2_dict)
-    # print("-------product_categ_3_dict--------",product_categ_3_dict)
-    # print("-------product_categ_4_dict--------",product_categ_4_dict)
-    # print("-------product_categ_5_dict--------",product_categ_5_dict)
-    # print("-------product_categ_6_dict--------",product_categ_6_dict)
-    # print("-------product_categ_7_dict--------",product_categ_7_dict)
-    # print("-------product_categ_8_dict--------",product_categ_8_dict)
-    # print("-------product_categ_9_dict--------",product_categ_9_dict)
-    # print("-------product_categ_10_dict--------",product_categ_10_dict)
     print("---------final---------", len(final_dict))
     for k in final_dict:
-            # print("----------k----------------",k)
         try:
             product_tmpl_id = server.execute(db_name, 2, db_password, 'product.template', "search",[('name', '=', k['tmpl_name'])])
             prod_category_id = False
@@ -209,14 +192,10 @@ for filepath in filelist:
                 if k.get("Product_category_1") and not prod_category_id:
                     prod_category_id = product_categ_1_dict.get(k['Product_category_1'])
                     csv_categ_count = 'Product_category_1'
-                # print("----------prod_category_id---------",prod_category_id)
-                # print("----------csv_categ_count---------",csv_categ_count)
                 for i in range(10,0,-1):
                     i_match = int(csv_categ_count.split("_")[-1])
                     if i_match == i:
                         for j in range(i_match,0,-1):
-                            # print("--------j------",j)
-                            # print("--------k------",k["Product_category_"+str(j)])
                             categ_dict_variable = "product_categ_%s_dict"%str(j)
                             update_categ_id = eval(categ_dict_variable).get(k["Product_category_"+str(j)])
                             if j != 1:
@@ -225,8 +204,6 @@ for filepath in filelist:
                             else:
                                 parent_categ_dict_variable = "product_categ_%s_dict" % str(j)
                                 parent_categ_id = eval(parent_categ_dict_variable).get(k["Product_category_" + str(j)])
-                            # print("--------categ_dict_variable-------", categ_dict_variable)
-                            # print("--------eval------",update_categ_id,parent_categ_id,type(parent_categ_id))
                             try:
                                 if j == 1:
                                     test = server.execute(db_name, 2, db_password, 'product.category', "write",[update_categ_id],{'parent_id': 1})
