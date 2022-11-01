@@ -150,3 +150,8 @@ class Barcode(models.Model):
 	@api.model
 	def _get_fields_stock_barcode(self):
 		return ['barcode', 'product_id']
+
+	def update_product_barcode(self):
+		for rec in self:
+			rec.product_id = rec.product_tmpl_id.product_variant_id.id
+		return True

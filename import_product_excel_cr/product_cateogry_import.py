@@ -218,5 +218,4 @@ for filepath in filelist:
         except:
             not_found.append(k['tmpl_name'])
 print("-----------not_found-----------",not_found)
-print("-----------missing_unspsc_categ-----------",missing_unspsc_categ)
 print("-----------missing_product_categ-----------",missing_product_categ)
