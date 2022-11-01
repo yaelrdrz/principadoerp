@@ -6,7 +6,7 @@ db_name = "yaelrdrz-principadoerp-main-5969988"
 db_password = "admin"
 server = xmlrpclib.ServerProxy('https://principado.odoo.com/xmlrpc/object',allow_none=True)
 # server = xmlrpclib.ServerProxy('http://localhost:8069/xmlrpc/object',allow_none=True)
-product_barcodes = server.execute(db_name, 2, db_password, 'product.barcode', "search",[('product_tmpl_id','!=',False)])
+product_barcodes = server.execute(db_name, 2, db_password, 'product.barcode', "search",[('product_tmpl_id','!=',False),('product_id','=',False)])
 print("-----product_barcodes---search----", len(product_barcodes))
 if product_barcodes:
     # count = 1

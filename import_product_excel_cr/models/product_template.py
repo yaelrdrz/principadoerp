@@ -39,6 +39,13 @@ class ProductTemplate(models.Model):
     size_attribute_value_id = fields.Many2one("product.attribute.value", string="Size Value")
     color_attribute_value_id = fields.Many2one("product.attribute.value", string="Color Value")
 
+    def name_get(self):
+        # Prefetch the fields used by the `name_get`, so `browse` doesn't fetch other fields
+        self.browse(self.ids).read(['name', 'default_code','size_attribute_value_id','color_attribute_value_id'])
+        return [(template.id,
+                 '%s%s%s' % (template.default_code and '[%s] ' % template.default_code or '', template.name, template.size_attribute_value_id and template.color_attribute_value_id and '(%s,%s) ' % (template.size_attribute_value_id.display_name,template.color_attribute_value_id.display_name) or ''))
+                for template in self]
+
 
     def update_attribute_values(self):
         for rec in self:
