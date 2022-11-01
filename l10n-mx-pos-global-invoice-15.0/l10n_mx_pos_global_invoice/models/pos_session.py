@@ -39,7 +39,6 @@ class PosSession(models.Model):
 
             global_customer = self.config_id.global_customer_id  # Cliente global de la config
             self.create_global_invoice(journal, global_customer, self)  # TODO: Fill
-
         else:
             super(PosSession, self)._create_account_move()
 
@@ -360,19 +359,20 @@ class PosSession(models.Model):
         data = pos_session._reconcile_account_move_lines(data)
         print("total_paid_orders", data.get('total_paid_orders'))
         print("data.get('invoice_lines')", data.get('invoice_lines'))
-        global_invoice.write({
-            'invoice_line_ids': [(0, None, invoice_line) for invoice_line in
-                                 data.get('invoice_lines')],
-        })
+        global_invoice.write({'invoice_line_ids': [(0, None, invoice_line) for invoice_line in
+                                 data.get('invoice_lines')],})
 
         if global_invoice.line_ids:
             global_invoice._post()
-            if global_invoice.line_ids and global_invoice.state == 'posted':
-                move_lines = self.env['account.move.line'].search([
-                    ('move_id', 'in', (global_invoice.id, account_move.id)),
-                    ('account_id', '=', pos_session.config_id.global_customer_id.property_account_receivable_id.id),
-                    ('name', '!=', 'From invoiced orders')
-                ]).reconcile()
+            global_invoice._js_all_outstanding_payments([pos_session.name])
+        # if global_invoice.line_ids:
+        #     global_invoice._post()
+        #     if global_invoice.line_ids and global_invoice.state == 'posted':
+        #         move_lines = self.env['account.move.line'].search([
+        #             ('move_id', 'in', (global_invoice.id, account_move.id)),
+        #             ('account_id', '=', pos_session.config_id.global_customer_id.property_account_receivable_id.id),
+        #             ('name', '!=', 'From invoiced orders')
+        #         ]).reconcile()
                 # print("move_lines",move_lines)
                 # for line in move_lines:
                 #     print("line",line)
@@ -443,7 +443,9 @@ class PosSession(models.Model):
                 'move_type': 'out_invoice',
             })
         data = {}
+        journal_name = []
         for pos_session in records:
+            journal_name.append(pos_session.name)
             _logger.error(str(pos_session.fields_get_keys()))
 
             ref_account = ((account_move.ref + ' | ') if account_move.ref else '')
@@ -474,34 +476,35 @@ class PosSession(models.Model):
                 ('name', 'like', _('Sales:'))
             ])
             if account_move.line_ids:
-                print("account_move 405", account_move.name, account_move.id, account_move.line_ids)
+                print("account_move 405-----------", account_move.name, account_move.id, account_move.line_ids)
                 lines = pos_session._line_correction_amounts_global_invoice(account_move.line_ids)
                 self.env['account.move.line'].with_context(check_move_validity=False).create(lines)
+                print('--------lines---482--', lines)
                 self.env['account.move.line'].search([('move_id', '=', account_move.id), ('check_global_invoice', '=', False)]).unlink()
+                print('--------lines---484--', account_move)
                 account_move._post()
             data = pos_session._reconcile_account_move_lines(data)
             print("total_paid_orders", data.get('total_paid_orders'))
             print("data.get('invoice_lines')", data.get('invoice_lines'))
             global_invoice.write({
-                'invoice_line_ids': [(0, None, invoice_line) for invoice_line in
-                                     data.get('invoice_lines')],
-            })
+                'invoice_line_ids': [(0, None, invoice_line) for invoice_line in  data.get('invoice_lines')],})
 
         if global_invoice.line_ids:
             global_invoice._post()
-            if global_invoice.line_ids and global_invoice.state == 'posted':
-                move_lines = self.env['account.move.line'].search([
-                ('move_id', 'in', (global_invoice.id, account_move.id)),
-                ('account_id', '=', pos_session.config_id.global_customer_id.property_account_receivable_id.id),
-                ('name', '!=', 'From invoiced orders')
-                ])
-                print("---------move_lines----------",move_lines)
+            global_invoice._js_all_outstanding_payments(journal_name)
+            # if global_invoice.line_ids and global_invoice.state == 'posted':
+            #     move_lines = self.env['account.move.line'].search([
+            #         ('move_id', 'in', (global_invoice.id, account_move.id)),
+            #         ('account_id', '=', pos_session.config_id.global_customer_id.property_account_receivable_id.id),
+            #         ('name', '!=', 'From invoiced orders')
+            #     ])
+            #     print("---------move_lines----------",move_lines)
                 # print("move_lines",move_lines)
-                for line in move_lines:
-                    print("line",line.move_id)
+                # for line in move_lines:
+                #     print("line",line.move_id)
                 #     line.reconcile()
 
-        stop
+        # stop
         records.write({'has_global_invoice': True})
 
 
