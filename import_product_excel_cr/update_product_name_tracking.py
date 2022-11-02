@@ -1,16 +1,17 @@
 import xmlrpc.client as xmlrpclib
 not_found = []
 
-db_name = "yaelrdrz-principadoerp-main-5969988"
-# db_name = "db_principado15"
+# db_name = "yaelrdrz-principadoerp-main-5969988"
+db_name = "db_principado15"
 db_password = "admin"
-server = xmlrpclib.ServerProxy('https://principado.odoo.com/xmlrpc/object',allow_none=True)
-# server = xmlrpclib.ServerProxy('http://localhost:8069/xmlrpc/object',allow_none=True)
+# server = xmlrpclib.ServerProxy('https://principado.odoo.com/xmlrpc/object',allow_none=True)
+server = xmlrpclib.ServerProxy('http://localhost:8069/xmlrpc/object',allow_none=True)
 product_tmpl_id = server.execute(db_name, 2, db_password, 'product.template', "search",[('size_attribute_value_id','!=',False),('color_attribute_value_id','!=',False)])
 print("-----product_tmpl_id---search----", len(product_tmpl_id))
 if product_tmpl_id:
     count = 1
     for tmpl in product_tmpl_id:
+        print("-------tmpl----------",tmpl)
         try:
             server.execute(db_name, 2, db_password, 'product.template', "update_product_name_tracking", [tmpl])
         except:
