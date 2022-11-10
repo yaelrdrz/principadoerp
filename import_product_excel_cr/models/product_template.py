@@ -45,6 +45,196 @@ class ProductTemplate(models.Model):
     #     return [(template.id,
     #              '%s%s%s' % (template.default_code and '[%s] ' % template.default_code or '', template.name, template.size_attribute_value_id and template.color_attribute_value_id and '(%s,%s) ' % (template.size_attribute_value_id.display_name,template.color_attribute_value_id.display_name) or ''))
     #             for template in self]
+    def add_product_category(self,parent_categ_names):
+        product_temp_id = self.env['product.template'].search([('name','=',parent_categ_names['tmpl_name'])],limit=1)
+        del parent_categ_names['tmpl_name']
+        del parent_categ_names['Variant_internal_reference']
+        category_id = self.add_category_value(parent_categ_names)
+        if category_id and product_temp_id:
+            product_temp_id.write({'categ_id':category_id})
+        return False
+        print('------category',category_id)
+
+
+
+    def add_category_value(self,parent_categ_names):
+        cat_dict = {}
+        for key, val in parent_categ_names.items():
+            if val:
+                cat_dict[int(key)] = val
+
+        print('---------cat--------len', len(cat_dict))
+        print('---------cat--------dict', cat_dict.get(1))
+
+        main_categ = self.env.ref('product.product_category_all')
+        cat_1 = self.env['product.category'].search([('name', '=', cat_dict.get(1)), ('parent_id', '=', main_categ.id)],
+                                                    limit=1)
+        if not cat_1:
+            l_cat = main_categ.id
+            for item in cat_dict:
+                categ_id = self.env['product.category'].create({
+                    'name': cat_dict[item],
+                    'parent_id': l_cat,
+                    'property_cost_method': 'average',
+                    'property_valuation': 'real_time'
+                })
+                l_cat = categ_id.id
+            return l_cat
+        else:
+            if len(cat_dict) == 1:
+                return cat_1.id
+        cat_2 = self.env['product.category'].search([('name', '=', cat_dict.get(2)), ('parent_id', '=', cat_1.id)],
+                                                    limit=1)
+        if not cat_2:
+            l_cat = cat_1.id
+            for item in cat_dict:
+                if item > 1:
+                    categ_id = self.env['product.category'].create({
+                        'name': cat_dict[item],
+                        'parent_id': l_cat,
+                        'property_cost_method': 'average',
+                        'property_valuation': 'real_time'})
+                    l_cat = categ_id.id
+            return l_cat
+        else:
+            if len(cat_dict) == 2:
+                return cat_2.id
+        cat_3 = self.env['product.category'].search([('name', '=', cat_dict.get(3)), ('parent_id', '=', cat_2.id)],
+                                                    limit=1)
+        if not cat_3:
+            l_cat = cat_2.id
+            for item in cat_dict:
+                if item > 2:
+                    categ_id = self.env['product.category'].create({
+                        'name': cat_dict[item],
+                        'parent_id': l_cat,
+                        'property_cost_method': 'average',
+                        'property_valuation': 'real_time'
+                    })
+                    l_cat = categ_id.id
+            return l_cat
+        else:
+            if len(cat_dict) == 3:
+                return cat_3.id
+        cat_4 = self.env['product.category'].search([('name', '=', cat_dict.get(4)), ('parent_id', '=', cat_3.id)],
+                                                    limit=1)
+        if not cat_4:
+            l_cat = cat_3.id
+            for item in cat_dict:
+                if item > 3:
+                    categ_id = self.env['product.category'].create({
+                        'name': cat_dict[item],
+                        'parent_id': l_cat,
+                        'property_cost_method': 'average',
+                        'property_valuation': 'real_time'
+                    })
+                    l_cat = categ_id.id
+            return l_cat
+        else:
+            if len(cat_dict) == 4:
+                return cat_4.id
+        cat_5 = self.env['product.category'].search([('name', '=', cat_dict.get(5)), ('parent_id', '=', cat_4.id)],
+                                                    limit=1)
+        if not cat_5:
+            l_cat = cat_4.id
+            for item in cat_dict:
+                if item > 4:
+                    categ_id = self.env['product.category'].create({
+                        'name': cat_dict[item],
+                        'parent_id': l_cat,
+                        'property_cost_method': 'average',
+                        'property_valuation': 'real_time'})
+                    l_cat = categ_id.id
+            return l_cat
+        else:
+            if len(cat_dict) == 5:
+                return cat_5.id
+        cat_6 = self.env['product.category'].search([('name', '=', cat_dict.get(6)), ('parent_id', '=', cat_5.id)],
+                                                    limit=1)
+        if not cat_6:
+            l_cat = cat_5.id
+            for item in cat_dict:
+                if item > 5:
+                    categ_id = self.env['product.category'].create({
+                        'name': cat_dict[item],
+                        'parent_id': l_cat,
+                        'property_cost_method': 'average',
+                        'property_valuation': 'real_time'
+                    })
+                    l_cat = categ_id.id
+            return l_cat
+        else:
+            if len(cat_dict) == 6:
+                return cat_6.id
+        cat_7 = self.env['product.category'].search([('name', '=', cat_dict.get(7)), ('parent_id', '=', cat_6.id)],
+                                                    limit=1)
+        if not cat_7:
+            l_cat = cat_6.id
+            for item in cat_dict:
+                if item > 6:
+                    categ_id = self.env['product.category'].create({
+                        'name': cat_dict[item],
+                        'parent_id': l_cat,
+                        'property_cost_method': 'average',
+                        'property_valuation': 'real_time'
+                    })
+                    l_cat = categ_id.id
+            return l_cat
+        else:
+            if len(cat_dict) == 7:
+                return cat_7.id
+        cat_8 = self.env['product.category'].search([('name', '=', cat_dict.get(8)), ('parent_id', '=', cat_7.id)],
+                                                    limit=1)
+        if not cat_8:
+            l_cat = cat_7.id
+            for item in cat_dict:
+                if item > 7:
+                    categ_id = self.env['product.category'].create({
+                        'name': cat_dict[item],
+                        'parent_id': l_cat,
+                        'property_cost_method': 'average',
+                        'property_valuation': 'real_time'
+                    })
+                    l_cat = categ_id.id
+            return l_cat
+        else:
+            if len(cat_dict) == 8:
+                return cat_8.id
+
+        cat_9 = self.env['product.category'].search([('name', '=', cat_dict.get(9)), ('parent_id', '=', cat_8.id)],
+                                                    limit=1)
+        if not cat_9:
+            l_cat = cat_8.id
+            for item in cat_dict:
+                if item > 8:
+                    categ_id = self.env['product.category'].create({
+                        'name': cat_dict[item],
+                        'parent_id': l_cat,
+                        'property_cost_method': 'average',
+                        'property_valuation': 'real_time'
+                    })
+                    l_cat = categ_id.id
+            return l_cat
+        else:
+            if len(cat_dict) == 9:
+                return cat_9.id
+        cat_10 = self.env['product.category'].search([('name', '=', cat_dict.get(10)), ('parent_id', '=', cat_9.id)],
+                                                     limit=1)
+        if not cat_10:
+            l_cat = cat_9.id
+            for item in cat_dict:
+                if item > 9:
+                    categ_id = self.env['product.category'].create({
+                        'name': cat_dict[item],
+                        'parent_id': l_cat,
+                        'property_cost_method': 'average',
+                        'property_valuation': 'real_time'
+                    })
+                    l_cat = categ_id.id
+            return l_cat
+        else:
+            if len(cat_dict) == 10:
+                return cat_10.id
 
     def update_product_name_tracking(self):
         for rec in self:
@@ -178,6 +368,10 @@ class ProductTemplate(models.Model):
 
 
     def product_search_sql_xmlrpc(self,name=False,code=False,size_value_id=False,color_value_id=False):
+        print('-------',name)
+        print('-------',code)
+        print('-------',size_value_id)
+        print('-------',color_value_id)
         if name and code and size_value_id and color_value_id:
             self.env.cr.execute("""
                 SELECT
@@ -185,7 +379,7 @@ class ProductTemplate(models.Model):
                 FROM
                     product_template as tmpl
                 WHERE
-                    tmpl.name = %s AND
+                    tmpl.name ilike %s AND
                     tmpl.default_code = %s AND
                     tmpl.size_attribute_value_id = %s AND
                     tmpl.color_attribute_value_id = %s
@@ -193,6 +387,7 @@ class ProductTemplate(models.Model):
                     tmpl.id
             """, (name,code,size_value_id,color_value_id))
             resp = self.env.cr.dictfetchall()
+            print('--------',resp)
             if resp:
                 return [resp[0].get("id")]
         return False

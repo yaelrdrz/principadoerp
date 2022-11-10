@@ -39,6 +39,19 @@
 				</xpath>                
 			</field>
 		</record>
+		<record id="product_barcode_tree_view" model="ir.ui.view">
+			<field name="name">Product Barcode tree</field>
+			<field name="model">product.barcode</field>
+			<field name="arch" type="xml">
+				<tree>
+
+						<field name="product_id" invisible="0"/>
+						<field name="product_tmpl_id" />
+						<field name="barcode" />
+
+				</tree>
+			</field>
+		</record>
 
 		<record id="product_barcode_view" model="ir.ui.view">
 			<field name="name">Product Barcode</field>
@@ -46,10 +59,22 @@
 			<field name="arch" type="xml">
 				<form>
 					<group>
-						<field name="product_id" invisible="1"/>
+						<field name="product_id" invisible="0"/>
+						<field name="product_tmpl_id" />
 						<field name="barcode" />
 					</group>
 				</form>
+			</field>
+		</record>
+		<record id="product_barcode_search_view" model="ir.ui.view">
+			<field name="name">Product Barcode search</field>
+			<field name="model">product.barcode</field>
+			<field name="arch" type="xml">
+				<search>
+						<field name="product_id" invisible="0"/>
+						<field name="product_tmpl_id" />
+						<field name="barcode"/>
+				</search>
 			</field>
 		</record>
 
