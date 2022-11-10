@@ -20,6 +20,10 @@
     'assets': {
         'web.assets_backend': [
             'custom_principado_cr/static/src/js/relational_fields.js',
+
+        ],
+        'point_of_sale.assets': [
+            'custom_principado_cr/static/src/scss/custom_style.scss',
         ],
     },
     'license': 'LGPL-3',

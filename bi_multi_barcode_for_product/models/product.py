@@ -71,7 +71,7 @@ class ProductInherit(models.Model):
 			# Search Record base on Multi Barcode
 			product_barcode_ids = self.env['product.barcode']._search([
 			('barcode', operator, name)], access_rights_uid=name_get_uid)
-			if product_barcode_ids:
+			if product_barcode_ids and not product_ids:
 				product_ids = product_ids + list(self._search(['|',
 					('product_barcode', 'in', product_barcode_ids),
 					('product_tmpl_id.product_barcode', 'in', product_barcode_ids)], 
