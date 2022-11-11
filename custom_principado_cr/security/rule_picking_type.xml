@@ -81,54 +81,172 @@
             <field name="groups" eval="[(4, ref('point_of_sale.group_pos_manager'))]"/>
         </record>
         <!--        Account Journal-->
-<!--        <record id="account_rule_manager_payment" model="ir.rule">-->
-<!--            <field name="name">Show All Journal Payments for Manager.</field>-->
-<!--            <field name="model_id" ref="account.model_account_payment"/>-->
-<!--            <field name="domain_force">[(1, '=', 1)]</field>-->
-<!--            <field name="groups" eval="[(4, ref('account.group_account_manager'))]"/>-->
-<!--        </record>-->
-<!--        <record id="account_rule_user_payment" model="ir.rule">-->
-<!--            <field name="name">Show Payments only for allowed Journal.</field>-->
-<!--            <field name="model_id" ref="account.model_account_payment"/>-->
-<!--            <field name="domain_force">[('journal_id', 'in', user.journal_ids.ids)]</field>-->
-<!--            <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>-->
-<!--        </record>-->
-<!--        <record id="account_rule_manager_move" model="ir.rule">-->
-<!--            <field name="name">Show All Invoice for Manager.</field>-->
-<!--            <field name="model_id" ref="account.model_account_move"/>-->
-<!--            <field name="domain_force">[(1, '=', 1)]</field>-->
-<!--            <field name="groups" eval="[(4, ref('account.group_account_manager'))]"/>-->
-<!--        </record>-->
-<!--        <record id="account_rule_user_move" model="ir.rule">-->
-<!--            <field name="name">Show Invoice only for allowed Journal.</field>-->
-<!--            <field name="model_id" ref="account.model_account_move"/>-->
-<!--            <field name="domain_force">[('journal_id', 'in', user.journal_ids.ids)]</field>-->
-<!--            <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>-->
-<!--        </record>-->
-<!--        <record id="account_rule_manager_move_line" model="ir.rule">-->
-<!--            <field name="name">Show All Invoice Line for Manager.</field>-->
-<!--            <field name="model_id" ref="account.model_account_move_line"/>-->
-<!--            <field name="domain_force">[(1, '=', 1)]</field>-->
-<!--            <field name="groups" eval="[(4, ref('account.group_account_manager'))]"/>-->
-<!--        </record>-->
-<!--        <record id="account_rule_user_move_line" model="ir.rule">-->
-<!--            <field name="name">Show Invoice Line only for allowed Journal.</field>-->
-<!--            <field name="model_id" ref="account.model_account_move_line"/>-->
-<!--            <field name="domain_force">[('journal_id', 'in', user.journal_ids.ids)]</field>-->
-<!--            <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>-->
-<!--        </record>-->
-<!--        <record id="account_rule_manager_journal" model="ir.rule">-->
-<!--            <field name="name">Show All Journal for Manager.</field>-->
-<!--            <field name="model_id" ref="account.model_account_journal"/>-->
-<!--            <field name="domain_force">[(1, '=', 1)]</field>-->
-<!--            <field name="groups" eval="[(4, ref('account.group_account_manager'))]"/>-->
-<!--        </record>-->
-<!--        <record id="account_rule_user_journal" model="ir.rule">-->
-<!--            <field name="name">Show Journal only for allowed Journal.</field>-->
-<!--            <field name="model_id" ref="account.model_account_journal"/>-->
-<!--            <field name="domain_force">[('id', 'in', user.journal_ids.ids)]</field>-->
-<!--            <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>-->
-<!--        </record>-->
+        <record id="account_rule_manager_payment" model="ir.rule">
+            <field name="name">Show All Journal Payments for Manager.</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('account.group_account_manager'))]"/>
+        </record>
+        <record id="account_rule_user_payment" model="ir.rule">
+            <field name="name">Show Payments only for allowed Journal.</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="domain_force">[('journal_id', 'in', user.journal_ids.ids)]</field>
+            <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>
+        </record>
+        <record id="account_rule_manager_move" model="ir.rule">
+            <field name="name">Show All Invoice for Manager.</field>
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('account.group_account_manager'))]"/>
+        </record>
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'account'), ('name', '=', 'account_move_see_all')]"/>
+            </function>
+            <value eval="{'noupdate': False}"/>
+        </function>
+         <record id="account.account_move_see_all" model="ir.rule">
+            <field name="name">All Journal Entries</field>
+            <field ref="account.model_account_move" name="model_id"/>
+            <field name="domain_force">[('journal_id', 'in', user.journal_ids.ids)]</field>
+            <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>
+        </record>
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'account'), ('name', '=', 'account_move_see_all')]"/>
+            </function>
+            <value eval="{'noupdate': True}"/>
+        </function>
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'account'), ('name', '=', 'account_move_rule_group_invoice')]"/>
+            </function>
+            <value eval="{'noupdate': False}"/>
+        </function>
+        <record id="account.account_move_rule_group_invoice" model="ir.rule">
+            <field name="name">Readonly Move</field>
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="domain_force">[('journal_id', 'in', user.journal_ids.ids)]</field>
+            <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>
+        </record>
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'account'), ('name', '=', 'account_move_rule_group_invoice')]"/>
+            </function>
+            <value eval="{'noupdate': True}"/>
+        </function>
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'account'), ('name', '=', 'account_move_rule_group_readonly')]"/>
+            </function>
+            <value eval="{'noupdate': False}"/>
+        </function>
+        <record id="account.account_move_rule_group_readonly" model="ir.rule">
+            <field name="name">Readonly Move</field>
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="domain_force">[('journal_id', 'in', user.journal_ids.ids)]</field>
+            <field name="groups" eval="[(4, ref('account.group_account_readonly'))]"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'account'), ('name', '=', 'account_move_rule_group_readonly')]"/>
+            </function>
+            <value eval="{'noupdate': True}"/>
+        </function>
+
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'account'), ('name', '=', 'account_move_line_see_all')]"/>
+            </function>
+            <value eval="{'noupdate': False}"/>
+        </function>
+        <record id="account.account_move_line_see_all" model="ir.rule">
+            <field name="name">All Journal Items</field>
+            <field ref="account.model_account_move_line" name="model_id"/>
+            <field name="domain_force">[('journal_id', 'in', user.journal_ids.ids)]</field>
+            <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>
+        </record>
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'account'), ('name', '=', 'account_move_line_see_all')]"/>
+            </function>
+            <value eval="{'noupdate': True}"/>
+        </function>
+
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'account'), ('name', '=', 'account_move_line_rule_group_invoice')]"/>
+            </function>
+            <value eval="{'noupdate': False}"/>
+        </function>
+        <record id="account.account_move_line_rule_group_invoice" model="ir.rule">
+            <field name="name">Readonly Move Line</field>
+            <field name="model_id" ref="account.model_account_move_line"/>
+            <field name="domain_force">[('journal_id', 'in', user.journal_ids.ids)]</field>
+            <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>
+        </record>
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'account'), ('name', '=', 'account_move_line_rule_group_invoice')]"/>
+            </function>
+            <value eval="{'noupdate': True}"/>
+        </function>
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'account'), ('name', '=', 'account_move_line_rule_group_readonly')]"/>
+            </function>
+            <value eval="{'noupdate': False}"/>
+        </function>
+        <record id="account.account_move_line_rule_group_readonly" model="ir.rule">
+            <field name="name">Readonly Move Line</field>
+            <field name="model_id" ref="account.model_account_move_line"/>
+            <field name="domain_force">[('journal_id', 'in', user.journal_ids.ids)]</field>
+            <field name="groups" eval="[(4, ref('account.group_account_readonly'))]"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'account'), ('name', '=', 'account_move_line_rule_group_readonly')]"/>
+            </function>
+            <value eval="{'noupdate': True}"/>
+        </function>
+
+        <record id="account_rule_user_move" model="ir.rule">
+            <field name="name">Show Invoice only for allowed Journal.</field>
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="domain_force">[('journal_id', 'in', user.journal_ids.ids)]</field>
+            <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>
+        </record>
+
+        <record id="account_rule_manager_move_line" model="ir.rule">
+            <field name="name">Show All Invoice Line for Manager.</field>
+            <field name="model_id" ref="account.model_account_move_line"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('account.group_account_manager'))]"/>
+        </record>
+        <record id="account_rule_user_move_line" model="ir.rule">
+            <field name="name">Show Invoice Line only for allowed Journal.</field>
+            <field name="model_id" ref="account.model_account_move_line"/>
+            <field name="domain_force">[('journal_id', 'in', user.journal_ids.ids)]</field>
+            <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>
+        </record>
+        <record id="account_rule_manager_journal" model="ir.rule">
+            <field name="name">Show All Journal for Manager.</field>
+            <field name="model_id" ref="account.model_account_journal"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('account.group_account_manager'))]"/>
+        </record>
+        <record id="account_rule_user_journal" model="ir.rule">
+            <field name="name">Show Journal only for allowed Journal.</field>
+            <field name="model_id" ref="account.model_account_journal"/>
+            <field name="domain_force">[('id', 'in', user.journal_ids.ids)]</field>
+            <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>
+        </record>
 
     </data>
 </odoo>
