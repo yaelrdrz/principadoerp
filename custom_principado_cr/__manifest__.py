@@ -9,7 +9,7 @@
     """,
     "category": "website",
     "website": "",
-    "depends": ['stock','point_of_sale'],
+    "depends": ['stock','point_of_sale','account'],
     'data': [
         'views/res_users.xml',
         'security/rule_picking_type.xml',
