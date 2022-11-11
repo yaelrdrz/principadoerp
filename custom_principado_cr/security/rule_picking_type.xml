@@ -5,33 +5,130 @@
         <record id="warehouse_rule_stock_picking_type" model="ir.rule">
             <field name="name">Operation Type For Warehouse Users</field>
             <field name="model_id" ref="stock.model_stock_picking_type"/>
-            <field name="groups" eval="[(4,ref('stock.group_stock_manager')),(4,ref('stock.group_stock_user'))]" />
+            <field name="groups" eval="[(4,ref('stock.group_stock_manager')),(4,ref('stock.group_stock_user'))]"/>
             <field name="domain_force">[('warehouse_id','in',user.warehouse_ids.ids)]</field>
         </record>
 
         <record id="warehouse_rule_stock_picking_type_admin" model="ir.rule">
             <field name="name">Operation Type For Admin User</field>
             <field name="model_id" ref="stock.model_stock_picking_type"/>
-            <field name="groups" eval="[(4,ref('base.group_system'))]" />
+            <field name="groups" eval="[(4,ref('base.group_system'))]"/>
             <field name="domain_force">[(1,'=',1)]</field>
         </record>
-
 
 
         <!--Rules for Stock Picking-->
         <record id="warehouse_rule_stock_picking" model="ir.rule">
             <field name="name">Transfers Warehouse Users</field>
             <field name="model_id" ref="stock.model_stock_picking"/>
-            <field name="groups" eval="[(4,ref('stock.group_stock_manager')),(4,ref('stock.group_stock_user'))]" />
+            <field name="groups" eval="[(4,ref('stock.group_stock_manager')),(4,ref('stock.group_stock_user'))]"/>
             <field name="domain_force">[('picking_type_id.warehouse_id','in',user.warehouse_ids.ids)]</field>
         </record>
 
         <record id="warehouse_rule_stock_picking_admin" model="ir.rule">
             <field name="name">Transfers For Admin User</field>
             <field name="model_id" ref="stock.model_stock_picking"/>
-            <field name="groups" eval="[(4,ref('base.group_system'))]" />
+            <field name="groups" eval="[(4,ref('base.group_system'))]"/>
             <field name="domain_force">[(1,'=',1)]</field>
         </record>
+        <!--      Pos session User-->
+        <record id="point_of_sale_rule_user_config" model="ir.rule">
+            <field name="name">Show only allowed POS configs for User</field>
+            <field name="model_id" ref="point_of_sale.model_pos_config"/>
+            <field name="domain_force">[('id', 'in', user.pos_config_ids.ids)]</field>
+            <field name="groups" eval="[(4, ref('point_of_sale.group_pos_user'))]"/>
+        </record>
+        <record id="point_of_sale_rule_manager_config" model="ir.rule">
+            <field name="name">All POS configs for Manager.</field>
+            <field name="model_id" ref="point_of_sale.model_pos_config"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('point_of_sale.group_pos_manager'))]"/>
+        </record>
+        <record id="point_of_sale_rule_user_session" model="ir.rule">
+            <field name="name">Show POS Sessions only for allowed POS configs.</field>
+            <field name="model_id" ref="point_of_sale.model_pos_session"/>
+            <field name="domain_force">[('config_id', 'in', user.pos_config_ids.ids)]</field>
+            <field name="groups" eval="[(4, ref('point_of_sale.group_pos_user'))]"/>
+        </record>
+        <record id="point_of_sale_rule_manager_session" model="ir.rule">
+            <field name="name">Show All POS Sessions for Manager.</field>
+            <field name="model_id" ref="point_of_sale.model_pos_session"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('point_of_sale.group_pos_manager'))]"/>
+        </record>
+        <record id="point_of_sale_rule_user_order" model="ir.rule">
+            <field name="name">Show POS Orders only for allowed POS configs.</field>
+            <field name="model_id" ref="point_of_sale.model_pos_order"/>
+            <field name="domain_force">[('config_id', 'in', user.pos_config_ids.ids)]</field>
+            <field name="groups" eval="[(4, ref('point_of_sale.group_pos_user'))]"/>
+        </record>
+        <record id="point_of_sale_rule_manager_order" model="ir.rule">
+            <field name="name">Show All POS Orders for Manager.</field>
+            <field name="model_id" ref="point_of_sale.model_pos_order"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('point_of_sale.group_pos_manager'))]"/>
+        </record>
+        <record id="point_of_sale_rule_user_payment" model="ir.rule">
+            <field name="name">Show POS Payments only for allowed POS configs.</field>
+            <field name="model_id" ref="point_of_sale.model_pos_payment"/>
+            <field name="domain_force">[('session_id.config_id', 'in', user.pos_config_ids.ids)]</field>
+            <field name="groups" eval="[(4, ref('point_of_sale.group_pos_user'))]"/>
+        </record>
+        <record id="point_of_sale_rule_manager_payment" model="ir.rule">
+            <field name="name">Show All POS Payments for Manager.</field>
+            <field name="model_id" ref="point_of_sale.model_pos_payment"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('point_of_sale.group_pos_manager'))]"/>
+        </record>
+        <!--        Account Journal-->
+<!--        <record id="account_rule_manager_payment" model="ir.rule">-->
+<!--            <field name="name">Show All Journal Payments for Manager.</field>-->
+<!--            <field name="model_id" ref="account.model_account_payment"/>-->
+<!--            <field name="domain_force">[(1, '=', 1)]</field>-->
+<!--            <field name="groups" eval="[(4, ref('account.group_account_manager'))]"/>-->
+<!--        </record>-->
+<!--        <record id="account_rule_user_payment" model="ir.rule">-->
+<!--            <field name="name">Show Payments only for allowed Journal.</field>-->
+<!--            <field name="model_id" ref="account.model_account_payment"/>-->
+<!--            <field name="domain_force">[('journal_id', 'in', user.journal_ids.ids)]</field>-->
+<!--            <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>-->
+<!--        </record>-->
+<!--        <record id="account_rule_manager_move" model="ir.rule">-->
+<!--            <field name="name">Show All Invoice for Manager.</field>-->
+<!--            <field name="model_id" ref="account.model_account_move"/>-->
+<!--            <field name="domain_force">[(1, '=', 1)]</field>-->
+<!--            <field name="groups" eval="[(4, ref('account.group_account_manager'))]"/>-->
+<!--        </record>-->
+<!--        <record id="account_rule_user_move" model="ir.rule">-->
+<!--            <field name="name">Show Invoice only for allowed Journal.</field>-->
+<!--            <field name="model_id" ref="account.model_account_move"/>-->
+<!--            <field name="domain_force">[('journal_id', 'in', user.journal_ids.ids)]</field>-->
+<!--            <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>-->
+<!--        </record>-->
+<!--        <record id="account_rule_manager_move_line" model="ir.rule">-->
+<!--            <field name="name">Show All Invoice Line for Manager.</field>-->
+<!--            <field name="model_id" ref="account.model_account_move_line"/>-->
+<!--            <field name="domain_force">[(1, '=', 1)]</field>-->
+<!--            <field name="groups" eval="[(4, ref('account.group_account_manager'))]"/>-->
+<!--        </record>-->
+<!--        <record id="account_rule_user_move_line" model="ir.rule">-->
+<!--            <field name="name">Show Invoice Line only for allowed Journal.</field>-->
+<!--            <field name="model_id" ref="account.model_account_move_line"/>-->
+<!--            <field name="domain_force">[('journal_id', 'in', user.journal_ids.ids)]</field>-->
+<!--            <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>-->
+<!--        </record>-->
+<!--        <record id="account_rule_manager_journal" model="ir.rule">-->
+<!--            <field name="name">Show All Journal for Manager.</field>-->
+<!--            <field name="model_id" ref="account.model_account_journal"/>-->
+<!--            <field name="domain_force">[(1, '=', 1)]</field>-->
+<!--            <field name="groups" eval="[(4, ref('account.group_account_manager'))]"/>-->
+<!--        </record>-->
+<!--        <record id="account_rule_user_journal" model="ir.rule">-->
+<!--            <field name="name">Show Journal only for allowed Journal.</field>-->
+<!--            <field name="model_id" ref="account.model_account_journal"/>-->
+<!--            <field name="domain_force">[('id', 'in', user.journal_ids.ids)]</field>-->
+<!--            <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>-->
+<!--        </record>-->
 
     </data>
 </odoo>
