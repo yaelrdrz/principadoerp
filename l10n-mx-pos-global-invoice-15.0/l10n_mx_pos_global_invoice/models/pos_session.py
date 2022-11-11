@@ -97,6 +97,7 @@ class PosSession(models.Model):
             order_is_invoiced = order.is_invoiced
             if order_is_invoiced:
                 continue
+            is_line_continue = False
             for payment in order.payment_ids:
                 amount = payment.amount
                 if float_is_zero(amount, precision_rounding=currency_rounding):
@@ -132,24 +133,25 @@ class PosSession(models.Model):
 
                     else:
                         # Create global invoice lines
-                        for order_line in order.lines:
-                            invoice_line = order._prepare_invoice_line(order_line)
-                            fiscal_position = self.move_id.fiscal_position_id
-                            accounts = order_line.product_id.product_tmpl_id\
-                                .get_product_accounts(fiscal_pos=fiscal_position)
-                            name = 'Ticket: ' + \
-                                order.pos_reference + ' | ' + invoice_line.get('name'),
-                            invoice_line.update({
-                                'move_id': self.move_id.id,
-                                'exclude_from_invoice_tab': False,
-                                'account_id': accounts['income'].id,
-                                'name': name,
-                                'credit': order_line.price_subtotal,
-                            })
-                            invoice_lines.append(invoice_line)
-                            total_paid_orders += order_line.price_subtotal_incl
-
-                        order.partner_id._increase_rank('customer_rank')
+                        if not is_line_continue:
+                            for order_line in order.lines:
+                                invoice_line = order._prepare_invoice_line(order_line)
+                                fiscal_position = self.move_id.fiscal_position_id
+                                accounts = order_line.product_id.product_tmpl_id\
+                                    .get_product_accounts(fiscal_pos=fiscal_position)
+                                name = 'Ticket: ' + \
+                                    order.pos_reference + ' | ' + invoice_line.get('name'),
+                                invoice_line.update({
+                                    'move_id': self.move_id.id,
+                                    'exclude_from_invoice_tab': False,
+                                    'account_id': accounts['income'].id,
+                                    'name': name,
+                                    'credit': order_line.price_subtotal,
+                                })
+                                invoice_lines.append(invoice_line)
+                                total_paid_orders += order_line.price_subtotal_incl
+                            is_line_continue = True
+                            order.partner_id._increase_rank('customer_rank')
 
                 # If pay_later, we create the receivable lines.
                 #   if split, with partner
@@ -461,12 +463,18 @@ class PosSession(models.Model):
                 'global_invoice_id': global_invoice.id,
             })
             data = pos_session._accumulate_amounts_global_invoice(data)
+            print('-=---data---1-----', data.get('invoice_lines'))
             data = pos_session._create_non_reconciliable_move_lines(data)
+            print('-=---data---2-----', data.get('invoice_lines'))
             data['bank_payment_method_diffs'] = data.get('bank_payment_method_diffs') or {}
             data = pos_session._create_bank_payment_moves(data)
+            print('-=---data---3-----', data.get('invoice_lines'))
             data = pos_session._create_cash_statement_lines_and_cash_move_lines(data)
+            print('-=---data---4-----', data.get('invoice_lines'))
             data = pos_session._create_invoice_receivable_lines(data)
+            print('-=---data---5-----', data.get('invoice_lines'))
             data = pos_session._create_stock_output_lines(data)
+            print('-=---data---6-----', data.get('invoice_lines'))
             balancing_account = False
             amount_to_balance = 0
             data = pos_session._create_balancing_line(data,balancing_account,amount_to_balance)
@@ -483,9 +491,10 @@ class PosSession(models.Model):
                 self.env['account.move.line'].search([('move_id', '=', account_move.id), ('check_global_invoice', '=', False)]).unlink()
                 print('--------lines---484--', account_move)
                 account_move._post()
+            print('-=---data---7-----', data.get('invoice_lines'))
             data = pos_session._reconcile_account_move_lines(data)
-            print("total_paid_orders", data.get('total_paid_orders'))
-            print("data.get('invoice_lines')", data.get('invoice_lines'))
+            print('-=---data---8-----', data.get('invoice_lines'))
+
             global_invoice.write({
                 'invoice_line_ids': [(0, None, invoice_line) for invoice_line in  data.get('invoice_lines')],})
 
