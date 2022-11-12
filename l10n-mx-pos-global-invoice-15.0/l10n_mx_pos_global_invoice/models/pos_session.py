@@ -515,6 +515,11 @@ class PosSession(models.Model):
 
         # stop
         records.write({'has_global_invoice': True})
+        for order in records.order_ids:
+            order.write({'account_move':global_invoice.id,
+                         'is_invoiced':True,
+                         'invoice_group':False})
+        # stop
 
 
         return {
