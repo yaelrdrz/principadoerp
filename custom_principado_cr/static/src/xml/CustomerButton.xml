@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="AddCustomerButton" owl="1">
+        <div class="control-button">
+            <i class="fa fa-user" role="img" aria-label="ADD Global Customer" title="ADD Global Customer"/>
+            Add Global Customer
+        </div>
+    </t>
+
+</templates>
