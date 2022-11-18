@@ -22,7 +22,6 @@
             'custom_principado_cr/static/src/js/relational_fields.js',
             'custom_principado_cr/static/src/js/CustomerButton.js',
             'custom_principado_cr/static/src/js/PaymentScreen.js',
-
         ],
         'point_of_sale.assets': [
             'custom_principado_cr/static/src/scss/custom_style.scss',

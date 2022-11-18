@@ -2,10 +2,12 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from collections import defaultdict
-from odoo import http, _
-from odoo.http import request
 from odoo.osv import expression
+
+from odoo import http
+from odoo.http import request
 from odoo.addons.stock_barcode.controllers.stock_barcode import StockBarcodeController
+
 
 class StockBarcodeProduct(StockBarcodeController):
 
