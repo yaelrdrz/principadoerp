@@ -24,7 +24,7 @@
             'custom_principado_cr/static/src/js/PaymentScreen.js',
         ],
         'point_of_sale.assets': [
-            'custom_principado_cr/static/src/scss/custom_style.scss',
+            # 'custom_principado_cr/static/src/scss/custom_style.scss',
         ],
         'web.assets_qweb': [
                     'custom_principado_cr/static/src/xml/**/*',
