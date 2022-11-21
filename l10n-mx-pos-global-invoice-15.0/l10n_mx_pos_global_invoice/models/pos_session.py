@@ -513,15 +513,14 @@ class PosSession(models.Model):
                 #     print("line",line.move_id)
                 #     line.reconcile()
 
-        # stop
         records.write({'has_global_invoice': True})
-        for order in records.order_ids:
+        for order in records.order_ids.filtered(lambda order: not order.account_move):
             order.write({'account_move':global_invoice.id,
                          'is_invoiced':True,
+                         'to_invoice':True,
                          'invoice_group': False,
                          'state': 'invoiced',
                          })
-        # stop
 
 
         return {
