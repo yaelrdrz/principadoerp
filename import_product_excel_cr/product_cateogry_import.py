@@ -14,8 +14,8 @@ for filepath in filelist:
     file1 = open(filepath)
     reader = csv.DictReader(file, delimiter=",")
     reader_categ = csv.DictReader(file1, delimiter=",")
-    # db_name = "yaelrdrz-principadoerp-main-5969988"
-    db_name = "db_principado15"
+    db_name = "yaelrdrz-principadoerp-main-5969988"
+    # db_name = "db_principado15"
     db_password = "AdM1nPr1nc."
     server = xmlrpclib.ServerProxy('https://principado.odoo.com/xmlrpc/object', allow_none=True)
     # server = xmlrpclib.ServerProxy('http://localhost:8069/xmlrpc/object',allow_none=True)
