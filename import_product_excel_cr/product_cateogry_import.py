@@ -5,7 +5,7 @@ import logging
 _logger = logging.getLogger(__name__)
 
 filelist = ['/home/odoo/src/user/import_product_excel_cr/principado_product/final_catalogue_141022_latest.csv']
-# filelist = ['/home/hardik/workspace/cr/principadoerp/import_product_excel_cr/principado_product/test1.csv']
+# filelist = ['/home/hardik/workspace/cr/principadoerp/import_product_excel_cr/principado_product/final_catalogue_141022_latest.csv']
 not_found = []
 missing_product_categ = []
 for filepath in filelist:
@@ -140,7 +140,6 @@ for filepath in filelist:
     for categ_line in reader_categ:
         # print("---------categ_line--------",categ_line)
         if main_categ_data and categ_line['Product_template_name'] in [x['Product_template_name'] for x in main_categ_data] and \
-            categ_line['Variant_internal_reference'] in [x['Variant_internal_reference'] for x in main_categ_data] and \
             categ_line['Attribute_1_size'] in [x['Attribute_1_size'] for x in main_categ_data] and \
             categ_line['Attribute_2_color'] in [x['Attribute_2_color'] for x in main_categ_data]:
             continue
@@ -153,9 +152,13 @@ for filepath in filelist:
                 "main_line": categ_line
             })
     print("-------main_categ_data------------",len(main_categ_data))
+    # stop
     for ll in main_categ_data:
             # print("--------main_line----------",ll['main_line'])
         try:
+            if ll['main_line'].get('Product_category_1'):
+                server.execute(db_name, 2, db_password, 'product.category', "write",[categ_dict.get(ll['main_line']['Product_category_1']+"##product_categ_1")],
+                                          {'parent_id': 1})
             if ll['main_line']['Product_category_1'] and ll['main_line']['Product_category_2']:
                 server.execute(db_name, 2, db_password, 'product.category', "write",[categ_dict.get(ll['main_line']['Product_category_2']+"##product_categ_2")],
                                           {'parent_id': categ_dict.get(ll['main_line']['Product_category_1']+"##product_categ_1")})
