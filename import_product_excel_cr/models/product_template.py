@@ -367,25 +367,19 @@ class ProductTemplate(models.Model):
             return tmpl_id[0]['id']
 
 
-    def product_search_sql_xmlrpc(self,name=False,code=False,size_value_id=False,color_value_id=False):
+    def product_search_sql_xmlrpc(self,name=False):
         print('-------',name)
-        print('-------',code)
-        print('-------',size_value_id)
-        print('-------',color_value_id)
-        if name and code and size_value_id and color_value_id:
+        if name:
             self.env.cr.execute("""
                 SELECT
                     tmpl.id
                 FROM
                     product_template as tmpl
                 WHERE
-                    tmpl.name ilike %s AND
-                    tmpl.default_code = %s AND
-                    tmpl.size_attribute_value_id = %s AND
-                    tmpl.color_attribute_value_id = %s
+                    tmpl.name = '%s'
                 GROUP BY
                     tmpl.id
-            """, (name,code,size_value_id,color_value_id))
+            """ % name)
             resp = self.env.cr.dictfetchall()
             print('--------',resp)
             if resp:
