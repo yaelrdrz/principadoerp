@@ -254,55 +254,81 @@ class ProductTemplate(models.Model):
                             line.value_ids = rec.color_attribute_value_id.ids
         return True
 
-
-
-    def product_create_sql_xmlrpc(self, vals={}):
+    def product_templ_create_sql_xmlrpc(self, vals={}):
         if vals:
-            tmpl_query = """
-                    INSERT INTO "product_template" ("id", "active", "allow_out_of_stock_order", "available_in_pos", 
-                    "available_threshold", "base_unit_count", "categ_id", "color_attribute_value_id", "create_date", 
-                    "create_uid", "default_code", "detailed_type", "expense_policy", "invoice_policy", "is_published", 
-                    "list_price", "name", "priority", "purchase_line_warn", "purchase_method", "purchase_ok", 
-                    "purchase_requisition", "sale_delay", "sale_line_warn", "sale_ok", "sequence", "service_type", 
-                    "show_availability", "size_attribute_value_id", "tracking", "type", "unspsc_code_id", "uom_id", 
-                    "uom_po_id", "website_sequence", "website_size_x", "website_size_y", "write_date", "write_uid") 
-                    VALUES (nextval(%s), %s, %s, %s, 
-                            %s, %s, %s, %s, %s, 
-                            %s, %s, %s, %s, %s, %s, 
-                            %s, %s, %s, %s, %s, %s, 
-                            %s, %s, %s, %s, %s, %s, 
-                            %s, %s, %s, %s, %s, %s, 
-                            %s, %s, %s, %s, %s, %s) RETURNING id;
-                    """
-            tmpl_params = ['product_template_id_seq', True, False, True,
-                        5.0, 0.0, 1, vals["color_attribute_value_id"], datetime.datetime.now(),
-                        2, vals['default_code'], 'product', 'no', 'order', True,
-                      vals['list_price'], vals['name'],'0', 'no-message', 'purchase', True,
-                      'rfq', 0.0, 'no-message', True, 1, 'manual',
-                           False, vals['size_attribute_value_id'], 'lot', 'product', vals['unspsc_code_id'], 1,
-                      1, 1, 1, 1, datetime.datetime.now(), 2]
-            self.env.cr.execute(tmpl_query, tmpl_params)
-            tmpl_id = self.env.cr.dictfetchall()
-            print("--------tmpl_id------------",tmpl_id)
-
+            if not vals.get('product_tmpl_id'):
+                tmpl_query = """
+                        INSERT INTO "product_template" ("id", "active", "allow_out_of_stock_order", "available_in_pos", 
+                        "available_threshold", "base_unit_count", "categ_id", "color_attribute_value_id", "create_date", 
+                        "create_uid", "default_code", "detailed_type", "expense_policy", "invoice_policy", "is_published", 
+                        "list_price", "name", "priority", "purchase_line_warn", "purchase_method", "purchase_ok", 
+                        "purchase_requisition", "sale_delay", "sale_line_warn", "sale_ok", "sequence", "service_type", 
+                        "show_availability", "size_attribute_value_id", "tracking", "type", "unspsc_code_id", "uom_id", 
+                        "uom_po_id", "website_sequence", "website_size_x", "website_size_y", "write_date", "write_uid") 
+                        VALUES (nextval(%s), %s, %s, %s, 
+                                %s, %s, %s, %s, %s, 
+                                %s, %s, %s, %s, %s, %s, 
+                                %s, %s, %s, %s, %s, %s, 
+                                %s, %s, %s, %s, %s, %s, 
+                                %s, %s, %s, %s, %s, %s, 
+                                %s, %s, %s, %s, %s, %s) RETURNING id;
+                        """
+                tmpl_params = ['product_template_id_seq', True, False, True,
+                            5.0, 0.0, 1, vals["color_attribute_value_id"], datetime.datetime.now(),
+                            2, vals['default_code'], 'product', 'no', 'order', True,
+                          vals['list_price'], vals['name'],'0', 'no-message', 'purchase', True,
+                          'rfq', 0.0, 'no-message', True, 1, 'manual',
+                               False, vals['size_attribute_value_id'], 'lot', 'product', vals['unspsc_code_id'], 1,
+                          1, 1, 1, 1, datetime.datetime.now(), 2]
+                self.env.cr.execute(tmpl_query, tmpl_params)
+                tmpl_id = self.env.cr.dictfetchall()
+            if vals.get('product_tmpl_id'):
+                tmpl_id = [{'id':vals['product_tmpl_id']}]
             supp_query = """
                     INSERT INTO "product_supplierinfo" ("id", "company_id", "create_date", "create_uid", "currency_id", 
                     "delay", "min_qty", "name", "price", "product_tmpl_id", "sequence", "write_date", "write_uid") 
                     VALUES (nextval(%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
                     """
-            supp_params = ['product_supplierinfo_id_seq', 1, datetime.datetime.now(), 2, 33, 1, '1.00', vals['vendor_partner_id'], '0.00', tmpl_id[0]['id'], 1, datetime.datetime.now(), 2]
-            self.env.cr.execute(supp_query, supp_params)
-            supp_id = self.env.cr.dictfetchall()
-            # print("--------supp_id------------", supp_id)
+            if vals.get('vendor_partner_id', False):
+                supp_params = ['product_supplierinfo_id_seq', 1, datetime.datetime.now(), 2, 33, 1, '1.00', vals['vendor_partner_id'], '0.00', tmpl_id[0]['id'], 1, datetime.datetime.now(), 2]
+                self.env.cr.execute(supp_query, supp_params)
+                supp_id = self.env.cr.dictfetchall()
 
-            size_query = """
-                    INSERT INTO "product_template_attribute_line" ("id", "active", "attribute_id", "create_date", "create_uid", 
-                    "product_tmpl_id", "write_date", "write_uid") VALUES (nextval(%s), %s, %s, %s, %s, %s, %s, %s) RETURNING id
-                    """
-            size_params = ['product_template_attribute_line_id_seq', True, vals['size_id'], datetime.datetime.now(), 2, tmpl_id[0]['id'], datetime.datetime.now(), 2]
-            self.env.cr.execute(size_query, size_params)
-            size_att_line_id = self.env.cr.dictfetchall()
-            # print("--------size_att_line_id------------", size_att_line_id)
+            attribute_line_id = self.env['product.template.attribute.line'].search([('attribute_id','in',[vals['size_id']]),
+                                                                                    ('product_tmpl_id','=',tmpl_id[0]['id']),
+                                                                                    ], limit=1)
+            if not attribute_line_id:
+                size_query = """
+                        INSERT INTO "product_template_attribute_line" ("id", "active", "attribute_id", "create_date", "create_uid", 
+                        "product_tmpl_id", "write_date", "write_uid") VALUES (nextval(%s), %s, %s, %s, %s, %s, %s, %s) RETURNING id
+                        """
+                size_params = ['product_template_attribute_line_id_seq', True, vals['size_id'],
+                               datetime.datetime.now(), 2, tmpl_id[0]['id'], datetime.datetime.now(), 2]
+                self.env.cr.execute(size_query, size_params)
+                size_att_line_id = self.env.cr.dictfetchall()
+            else:
+                size_att_line_id = [{'id': attribute_line_id.id}]
+
+            size_search_val = self.env.cr.execute("""
+                            SELECT
+                                *
+                            FROM
+                                product_attribute_value_product_template_attribute_line_rel 
+                            WHERE
+                                product_template_attribute_line_id =%s AND 
+                                product_attribute_value_id=%s 
+                        """ % (
+                (size_att_line_id[0]['id']), (vals['size_value_id'])))
+
+            if not size_search_val:
+                size_value_query = """
+                                            INSERT INTO "product_attribute_value_product_template_attribute_line_rel" (
+                                            "product_template_attribute_line_id", "product_attribute_value_id") 
+                                            VALUES (%s, %s)
+                                    """
+                size_value_params = [size_att_line_id[0]['id'],
+                                     vals['size_value_id']]
+                self.env.cr.execute(size_value_query, size_value_params)
 
             color_query = """
                         INSERT INTO "product_template_attribute_line" ("id", "active", "attribute_id", "create_date", "create_uid", 
@@ -314,28 +340,13 @@ class ProductTemplate(models.Model):
             color_att_line_id = self.env.cr.dictfetchall()
             # print("--------color_att_line_id------------", color_att_line_id)
 
-            size_value_query = """
-                            INSERT INTO "product_template_attribute_value" ("id", "attribute_line_id", "color", 
-                            "create_date", "create_uid", "price_extra", "product_attribute_value_id", 
-                            "ptav_active", "write_date", "write_uid") 
-                            VALUES (nextval(%s), %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
-                    """
-            size_value_params = ['product_template_attribute_value_id_seq', size_att_line_id[0]['id'], 10, datetime.datetime.now(), 2, '0.00', vals['size_value_id'], True, datetime.datetime.now(), 2]
-            self.env.cr.execute(size_value_query, size_value_params)
-            size_value_att_line_id = self.env.cr.dictfetchall()
-            print("--------size_value_att_line_id------------", size_value_att_line_id)
-
             color_value_query = """
-                                        INSERT INTO "product_template_attribute_value" ("id", "attribute_line_id", "color", 
-                                        "create_date", "create_uid", "price_extra", "product_attribute_value_id", 
-                                        "ptav_active", "write_date", "write_uid") 
-                                        VALUES (nextval(%s), %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
+                                        INSERT INTO "product_attribute_value_product_template_attribute_line_rel" (
+                                        "product_template_attribute_line_id", "product_attribute_value_id") 
+                                        VALUES (%s, %s)
                                 """
-            color_value_params = ['product_template_attribute_value_id_seq', color_att_line_id[0]['id'], 10,
-                                 datetime.datetime.now(), 2, '0.00', vals['color_value_id'], True,
-                                 datetime.datetime.now(), 2]
+            color_value_params = [color_att_line_id[0]['id'], vals['color_value_id']]
             self.env.cr.execute(color_value_query, color_value_params)
-            color_value_att_line_id = self.env.cr.dictfetchall()
             # print("--------color_value_att_line_id------------", color_value_att_line_id)
 
             product_query = """
@@ -346,29 +357,174 @@ class ProductTemplate(models.Model):
             product_params = ['product_product_id_seq', True, 0.0, datetime.datetime.now(), 2, tmpl_id[0]['id'], datetime.datetime.now(), 2]
             self.env.cr.execute(product_query, product_params)
             product_id = self.env.cr.dictfetchall()
-            # print("--------product_id------------", product_id)
 
-            mail_follow_query = """
-                            INSERT INTO "mail_followers" ("id", "partner_id", "res_id", "res_model") VALUES (nextval(%s), %s, %s, %s) RETURNING id
-                        """
-            mail_follow_params = ['mail_followers_id_seq', 3, product_id[0]['id'], 'product.product']
-            self.env.cr.execute(mail_follow_query, mail_follow_params)
-            mail_follow_id = self.env.cr.dictfetchall()
-            # print("--------mail_follow_id------------", mail_follow_id)
-
-            ir_property_query = """
-                            INSERT INTO "ir_property" ("id", "company_id", "create_date", "create_uid", "fields_id", 
-                            "name", "res_id", "type", "value_reference", "write_date", "write_uid") 
-                            VALUES (nextval(%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
-                        """
-            ir_property_params = ['ir_property_id_seq', 1, datetime.datetime.now(), 2, 7967, 'responsible_id',
-                                  'product.template,'+str(tmpl_id[0]['id']), 'many2one', 'res.users,2', datetime.datetime.now(), 2]
-            self.env.cr.execute(ir_property_query, ir_property_params)
             return tmpl_id[0]['id']
 
+    def prod_template_create_attrs(self, vals={}):
+        print ('---------===========',self, vals)
+        if vals:
+            attribute_line_id = self.env['product.template.attribute.line'].search([('attribute_id','in',[10]),('product_tmpl_id','=',self.id),], limit=1)
+            if not attribute_line_id:
+                size_query = """
+                        INSERT INTO "product_template_attribute_line" ("id", "active", "attribute_id", "create_date", "create_uid", 
+                        "product_tmpl_id", "write_date", "write_uid") VALUES (nextval(%s), %s, %s, %s, %s, %s, %s, %s) RETURNING id
+                        """
+                size_params = ['product_template_attribute_line_id_seq', True, [10],
+                               datetime.datetime.now(), 2, self.id, datetime.datetime.now(), 2]
+                self.env.cr.execute(size_query, size_params)
+                size_att_line_id = self.env.cr.dictfetchall()
+            else:
+                size_att_line_id = [{'id': attribute_line_id.id}]
+
+            sizeexist_search_query = """
+                            SELECT 1 FROM "product_attribute_value_product_template_attribute_line_rel" AS "vals"
+                            WHERE "vals"."product_template_attribute_line_id" in (%s) AND "vals"."product_attribute_value_id" in (%s)  
+                        """  % ((size_att_line_id[0]['id']),(vals['value_orig']))
+            self.env.cr.execute(sizeexist_search_query)
+            result = self.env.cr.fetchone()
+
+            if not result or result == None:
+                size_value_query = """
+                            INSERT INTO "product_attribute_value_product_template_attribute_line_rel" (
+                            "product_template_attribute_line_id", "product_attribute_value_id") 
+                            VALUES (%s, %s)
+                                    """
+                size_value_params = [size_att_line_id[0]['id'], vals['value_orig']]
+                self.env.cr.execute(size_value_query, size_value_params)
+
+            #2nd Attribute for Color
+            color_attribute_line_id = self.env['product.template.attribute.line'].search(
+                [('attribute_id', 'in', [11]), ('product_tmpl_id', '=', self.id), ], limit=1)
+            if not color_attribute_line_id:
+                size_query = """
+                                    INSERT INTO "product_template_attribute_line" ("id", "active", "attribute_id", "create_date", "create_uid", 
+                                    "product_tmpl_id", "write_date", "write_uid") VALUES (nextval(%s), %s, %s, %s, %s, %s, %s, %s) RETURNING id
+                                    """
+                size_params = ['product_template_attribute_line_id_seq', True, [11],
+                               datetime.datetime.now(), 2, self.id, datetime.datetime.now(), 2]
+                self.env.cr.execute(size_query, size_params)
+                color_attribute_line_id = self.env.cr.dictfetchall()
+            else:
+                color_attribute_line_id = [{'id': color_attribute_line_id.id}]
+            colorexist_search_query = """
+                                        SELECT 1 FROM "product_attribute_value_product_template_attribute_line_rel" AS "vals"
+                                        WHERE "vals"."product_template_attribute_line_id" in (%s) AND "vals"."product_attribute_value_id" in (%s)  
+                                    """ % ((color_attribute_line_id[0]['id']), (vals['color_value_orig']))
+            self.env.cr.execute(colorexist_search_query)
+            result_color = self.env.cr.fetchone()
+            if not result_color or result_color == None:
+                color_query = """
+                        INSERT INTO "product_attribute_value_product_template_attribute_line_rel" (
+                            "product_template_attribute_line_id", "product_attribute_value_id") 
+                            VALUES (%s, %s)
+                                    """
+                color_params = [color_attribute_line_id[0]['id'], vals['color_value_orig']]
+                self.env.cr.execute(color_query, color_params)
+            return self.id
+
+    def product_create_sql_xmlrpc(self, vals={}):
+        if vals:
+            if not vals.get('product_tmpl_id'):
+                tmpl_query = """
+                        INSERT INTO "product_template" ("id", "active", "allow_out_of_stock_order", "available_in_pos", 
+                        "available_threshold", "base_unit_count", "categ_id", "color_attribute_value_id", "create_date", 
+                        "create_uid", "default_code", "detailed_type", "expense_policy", "invoice_policy", "is_published", 
+                        "list_price", "name", "priority", "purchase_line_warn", "purchase_method", "purchase_ok", 
+                        "purchase_requisition", "sale_delay", "sale_line_warn", "sale_ok", "sequence", "service_type", 
+                        "show_availability", "size_attribute_value_id", "tracking", "type", "unspsc_code_id", "uom_id", 
+                        "uom_po_id", "website_sequence", "website_size_x", "website_size_y", "write_date", "write_uid") 
+                        VALUES (nextval(%s), %s, %s, %s, 
+                                %s, %s, %s, %s, %s, 
+                                %s, %s, %s, %s, %s, %s, 
+                                %s, %s, %s, %s, %s, %s, 
+                                %s, %s, %s, %s, %s, %s, 
+                                %s, %s, %s, %s, %s, %s, 
+                                %s, %s, %s, %s, %s, %s) RETURNING id;
+                        """
+                tmpl_params = ['product_template_id_seq', True, False, True,
+                            5.0, 0.0, 1, vals["color_attribute_value_id"], datetime.datetime.now(),
+                            2, vals['default_code'], 'product', 'no', 'order', True,
+                          vals['list_price'], vals['name'],'0', 'no-message', 'purchase', True,
+                          'rfq', 0.0, 'no-message', True, 1, 'manual',
+                               False, vals['size_attribute_value_id'], 'lot', 'product', vals['unspsc_code_id'], 1,
+                          1, 1, 1, 1, datetime.datetime.now(), 2]
+                self.env.cr.execute(tmpl_query, tmpl_params)
+                tmpl_id = self.env.cr.dictfetchall()
+            if vals.get('product_tmpl_id'):
+                tmpl_id = [{'id':vals['product_tmpl_id']}]
+            supp_query = """
+                    INSERT INTO "product_supplierinfo" ("id", "company_id", "create_date", "create_uid", "currency_id", 
+                    "delay", "min_qty", "name", "price", "product_tmpl_id", "sequence", "write_date", "write_uid") 
+                    VALUES (nextval(%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
+                    """
+            if vals.get('vendor_partner_id', False):
+                supp_params = ['product_supplierinfo_id_seq', 1, datetime.datetime.now(), 2, 33, 1, '1.00', vals['vendor_partner_id'], '0.00', tmpl_id[0]['id'], 1, datetime.datetime.now(), 2]
+                self.env.cr.execute(supp_query, supp_params)
+                supp_id = self.env.cr.dictfetchall()
+
+            attribute_line_id = self.env['product.template.attribute.line'].search([('attribute_id','in',[vals['size_id']]),
+                                                                                    ('product_tmpl_id','=',tmpl_id[0]['id']),
+                                                                                    ], limit=1)
+            if not attribute_line_id:
+                size_query = """
+                        INSERT INTO "product_template_attribute_line" ("id", "active", "attribute_id", "create_date", "create_uid", 
+                        "product_tmpl_id", "write_date", "write_uid") VALUES (nextval(%s), %s, %s, %s, %s, %s, %s, %s) RETURNING id
+                        """
+                size_params = ['product_template_attribute_line_id_seq', True, vals['size_id'],
+                               datetime.datetime.now(), 2, tmpl_id[0]['id'], datetime.datetime.now(), 2]
+                self.env.cr.execute(size_query, size_params)
+                size_att_line_id = self.env.cr.dictfetchall()
+            else:
+                size_att_line_id = [{'id': attribute_line_id.id}]
+
+            size_search_val = self.env.cr.execute("""
+                            SELECT * FROM product_attribute_value_product_template_attribute_line_rel 
+                            WHERE
+                                product_template_attribute_line_id =%s AND product_attribute_value_id=%s 
+                        """ % (
+                (size_att_line_id[0]['id']), (vals['size_value_id'])))
+
+            if not size_search_val:
+                size_value_query = """
+                            INSERT INTO "product_attribute_value_product_template_attribute_line_rel" (
+                            "product_template_attribute_line_id", "product_attribute_value_id") 
+                            VALUES (%s, %s)
+                                    """
+                size_value_params = [size_att_line_id[0]['id'],
+                                     vals['size_value_id']]
+                self.env.cr.execute(size_value_query, size_value_params)
+
+            color_query = """
+                        INSERT INTO "product_template_attribute_line" ("id", "active", "attribute_id", "create_date", "create_uid", 
+                        "product_tmpl_id", "write_date", "write_uid") VALUES (nextval(%s), %s, %s, %s, %s, %s, %s, %s) RETURNING id
+                        """
+            color_params = ['product_template_attribute_line_id_seq', True, vals['color_id'], datetime.datetime.now(), 2,
+                           tmpl_id[0]['id'], datetime.datetime.now(), 2]
+            self.env.cr.execute(color_query, color_params)
+            color_att_line_id = self.env.cr.dictfetchall()
+            # print("--------color_att_line_id------------", color_att_line_id)
+
+            color_value_query = """
+                                        INSERT INTO "product_attribute_value_product_template_attribute_line_rel" (
+                                        "product_template_attribute_line_id", "product_attribute_value_id") 
+                                        VALUES (%s, %s)
+                                """
+            color_value_params = [color_att_line_id[0]['id'], vals['color_value_id']]
+            self.env.cr.execute(color_value_query, color_value_params)
+            # print("--------color_value_att_line_id------------", color_value_att_line_id)
+
+            product_query = """
+                        INSERT INTO "product_product" ("id", "active", "base_unit_count", "create_date", "create_uid", 
+                        "product_tmpl_id", "write_date", "write_uid") 
+                        VALUES (nextval(%s), %s, %s, %s, %s, %s, %s, %s) RETURNING id
+                    """
+            product_params = ['product_product_id_seq', True, 0.0, datetime.datetime.now(), 2, tmpl_id[0]['id'], datetime.datetime.now(), 2]
+            self.env.cr.execute(product_query, product_params)
+            product_id = self.env.cr.dictfetchall()
+
+            return tmpl_id[0]['id']
 
     def product_search_sql_xmlrpc(self,name=False):
-        print('-------',name)
         if name:
             self.env.cr.execute("""
                 SELECT
