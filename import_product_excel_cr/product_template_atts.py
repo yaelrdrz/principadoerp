@@ -17,7 +17,7 @@ sock = xmlrpclib.ServerProxy('https://principado.odoo.com/xmlrpc/object'.format(
 row = 0
 not_found = []
 import csv
-with open('final_catalogue_141022_latest.csv', mode='r')as file:
+with open('/home/odoo/src/user/import_product_excel_cr/principado_product/final_catalogue_141022_latest.csv', mode='r')as file:
 	reader = csv.reader(file)
 	final_dict = {}
 	uom_list = {}
