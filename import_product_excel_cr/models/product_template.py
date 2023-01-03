@@ -316,10 +316,10 @@ class ProductTemplate(models.Model):
         count = 0
         # template_ids = template_ids[289:]
         for rec in template_ids:
+            _logger.info('>>>>>>>>>>>>>product_variant_ids>>>>>>>>>%s', rec.product_variant_ids)
             rec._create_variant_ids()
-            print('after --------', rec.product_variant_ids)
+            _logger.info('after --------%s', rec.product_variant_ids)
             count += 1
-            print('count ======', count, rec)
             _logger.info('----------->>>> count %s tmpl %s ', count, rec)
         print ('created variant done----======================----------')
         return True
