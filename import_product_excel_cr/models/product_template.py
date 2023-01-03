@@ -301,14 +301,18 @@ class ProductTemplate(models.Model):
                 line._update_product_template_attribute_values()
             count +=1
             print ('count ======',count, tmpl)
+            _logger.info('----------->>>> count %s tmpl %s ', count, tmpl)
         print ('update varinat template vlauessssssssssss done ----------------')
         return True
 
     def create_variant_vals(self, vals={}):
         template_ids = self.env['product.template'].search([('name', 'ilike', '-Duplicate')])
         count = 0
+        # template_ids = template_ids[289:]
         for rec in template_ids:
+            print('>>>>>>>>>>>>>product_variant_ids>>>>>>>>>', rec.product_variant_ids)
             rec._create_variant_ids()
+            print('after --------', rec.product_variant_ids)
             count += 1
             print('count ======', count, rec)
         print ('created variant done----======================----------')
