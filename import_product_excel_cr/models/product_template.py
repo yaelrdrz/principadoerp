@@ -58,6 +58,12 @@ class ProductTemplateAttributeLine(models.Model):
         ProductTemplateAttributeValue.create(ptav_to_create)
         # self.product_tmpl_id._create_variant_ids()
 
+class ProductProduct(models.Model):
+    _inherit = "product.product"
+
+    size_attribute_value_id = fields.Many2one("product.attribute.value", string="Size Value")
+    color_attribute_value_id = fields.Many2one("product.attribute.value", string="Color Value")
+
 
 class ProductUnspscCode(models.Model):
     _inherit = "product.unspsc.code"
@@ -310,11 +316,11 @@ class ProductTemplate(models.Model):
         count = 0
         # template_ids = template_ids[289:]
         for rec in template_ids:
-            print('>>>>>>>>>>>>>product_variant_ids>>>>>>>>>', rec.product_variant_ids)
             rec._create_variant_ids()
             print('after --------', rec.product_variant_ids)
             count += 1
             print('count ======', count, rec)
+            _logger.info('----------->>>> count %s tmpl %s ', count, rec)
         print ('created variant done----======================----------')
         return True
 
