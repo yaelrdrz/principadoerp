@@ -34,6 +34,8 @@ with open('/home/odoo/src/user/import_product_excel_cr/principado_product/final_
                                             ('color_attribute_value_id', 'in', [color_value_id[0]])
                                             ]],
                           {'fields': ['product_tmpl_id', 'name']})
+        _logger.info('------------>>>>>>>>> product search read ---- %s',name_read)
+        print ('------------>>>>>>>>> product search read ----', name_read)
         if name_read and name_read[0]['name'] == line[1] + ' -Duplicate':
             barcode_id = sock.execute(dbname, 2, password, 'product.barcode', "search", [('barcode', '=', line[2] + '-Duplicate')])
             barcode_update = sock.execute(dbname, 2, password, 'product.barcode', "write",
@@ -43,5 +45,5 @@ with open('/home/odoo/src/user/import_product_excel_cr/principado_product/final_
             product_variant_update = sock.execute(dbname, 2, password, 'product.product', "write",
                                                   [name_read[0]['id']], {"default_code": line[3]})
         _logger.info('line number ------------------->>>>%s', line[0])
-        print (line[0])
+        print ('===================',line[0])
 
