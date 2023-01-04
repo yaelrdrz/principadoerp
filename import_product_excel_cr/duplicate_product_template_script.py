@@ -15,7 +15,7 @@ sock = xmlrpclib.ServerProxy('https://principado.odoo.com/xmlrpc/object', allow_
 
 import csv
 
-with open('/home/erp/repo/principadoerp/import_product_excel_cr/sample.csv', mode='r')as file:
+with open('/home/erp/repo/principadoerp/import_product_excel_cr/final_catalogue_141022_latest.csv', mode='r')as file:
     reader = csv.reader(file)
     raw_data = [x for x in reader]
     barcode_value_dict = {}
@@ -81,5 +81,5 @@ with open('/home/erp/repo/principadoerp/import_product_excel_cr/sample.csv', mod
                                            'product_tmpl_id': name_read[0]['product_tmpl_id'][0]})
             product_variant_update = sock.execute(dbname, 2, password, 'product.product', "write",
                                                   product_name_search, {"default_code": line[3]})
-        print ('line number ------------------->>>>', line[0])
+        _logger.info('line number ------------------->>>>%s', line[0])
 
