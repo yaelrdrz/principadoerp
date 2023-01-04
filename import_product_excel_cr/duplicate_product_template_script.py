@@ -15,7 +15,7 @@ sock = xmlrpclib.ServerProxy('https://principado.odoo.com/xmlrpc/object', allow_
 
 import csv
 
-with open('/home/erp/repo/principadoerp/import_product_excel_cr/final_catalogue_141022_latest.csv', mode='r')as file:
+with open('/home/odoo/src/user/import_product_excel_cr/principado_product/final_catalogue_141022_latest.csv', mode='r')as file:
     reader = csv.reader(file)
     raw_data = [x for x in reader]
     barcode_value_dict = {}
